@@ -1,0 +1,7 @@
+{
+    "mt5": {
+        "symbols": ["BCHUSD"],
+        "timeout": 60000,
+        "timeframe": "one_minute"
+    }
+}

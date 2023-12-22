@@ -1,6 +1,6 @@
 
 import abc
-from src.candlesticks import Candlesticks
+from src.symbols_adapter import SymbolsAdapter
 
 class Trade(object):
     pass
@@ -13,28 +13,11 @@ class IMetaTrader(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_seed(self) -> object:
-        pass
-
-    @abc.abstractmethod
-    def get_next(self) -> object:
-        pass
-
-    @abc.abstractmethod
-    def get_candlesticks(self) -> Candlesticks:
-        pass
-
-    @abc.abstractmethod
-    def check_if_next(self) -> bool:
-        pass
-
-    @abc.abstractmethod
     def execute_trade(self, trade: Trade) -> str:
         pass
 
-
 class IStrategy(abc.ABC):
-    
+
     @abc.abstractmethod
     def process_seed(self, data: object) -> bool:
         pass
@@ -44,6 +27,10 @@ class IStrategy(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def find_signals(self, data: object) -> int:
+    def check_next(self) -> bool:
+        pass
+
+    @abc.abstractmethod
+    def check_signal(self) -> bool:
         pass
     

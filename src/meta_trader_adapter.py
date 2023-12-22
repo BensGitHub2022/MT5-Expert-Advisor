@@ -2,7 +2,7 @@ import MetaTrader5 as mt5
 import pandas as pd
 
 from src.interfaces import IMetaTrader, Trade
-from src.candlesticks import Candlesticks
+from src.symbols_adapter import SymbolsAdapter
 from src.json_reader import JsonReader
 
 class MetaTraderAdapter(IMetaTrader):
@@ -64,33 +64,5 @@ class MetaTraderAdapter(IMetaTrader):
         
         return True
 
-    def set_candlesticks(self, symbol: str, timeframe: str) -> None:
-        self.symbol = symbol
-        self.timeframe = timeframe
-
-    def get_seed(self, seed_count) -> object:
-        c = self.get_candlesticks(seed_count)
-        df = c.get_candles_dataframe()
-        return df
-
-    def get_next(self) -> object:
-        c = self.get_candlesticks(1)
-        df = c.get_candles_dataframe()
-        return df
-
-    def get_candlesticks(self, num_candlesticks) -> Candlesticks:
-        c = Candlesticks(self.symbol,self.timeframe,num_candlesticks)
-        return c
-    
-    def check_if_next(self, current_time) -> bool:
-        new_candle = self.get_candlesticks(1)
-        new_candle = new_candle.get_candles_dataframe()
-        time_per_candle = new_candle['time'][0]
-        if(current_time != time_per_candle):
-            return True
-        else:
-            return False
-
     def execute_trade(self, trade: Trade):
         return "Traded!"
-    

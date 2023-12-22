@@ -1,5 +1,5 @@
 
-from src.interfaces import IMetaTrader, Candlesticks, Trade
+from src.interfaces import IMetaTrader, SymbolsAdapter, Trade
 
 class MetaTraderMock(IMetaTrader):
     something: float
@@ -17,8 +17,8 @@ class MetaTraderMock(IMetaTrader):
     def get_next(self) -> object:
         return "Next"
 
-    def get_candlesticks(self) -> Candlesticks:
-        c = Candlesticks()
+    def get_candlesticks(self) -> SymbolsAdapter:
+        c = SymbolsAdapter()
         return c
     
     def check_if_next(self) -> bool:

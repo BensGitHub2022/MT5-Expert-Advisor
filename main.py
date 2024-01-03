@@ -45,9 +45,6 @@ def main():
     print("Using the " + strategy.get_strategy_name() + ", trading on " + symbol.get_symbol_name())
     # print(symbol.get_symbol_info()) # Need to implement in mock!
 
-    
-
-    
     #trade_executor = TradeExecutorAdapter()
     
     #positions = trade_executor.get_positions()
@@ -60,11 +57,12 @@ def main():
 
     strategy.record_action()
     action_writer.print_action()
-    """
+    
     while (True):
         if(strategy.check_next(symbol.get_candlestick_time())):
             strategy.process_next(symbol.get_candlesticks(NEXT))
             signal = strategy.check_signal()
+            """
             match signal.get('action'):
                 case 1:
                     if(trade_executor.get_positions()):
@@ -76,10 +74,10 @@ def main():
                     trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_bid(),20) 
                 case 0:
                     trade_executor.do_nothing()
-                    
+            """     
             strategy.record_action()
             action_writer.print_action()
-    """
+    
 
     """
     strategy = EmaStrategy()

@@ -10,8 +10,8 @@ class MetaTraderFactory():
     def __init__(self, production: bool):
         self.production = production
 
-    def create_meta_trader(self) -> IMetaTrader:
+    def create_meta_trader(self, json_settings: dict, credentials: dict) -> IMetaTrader:
         if (self.production):
-            return MetaTraderAdapter()
+            return MetaTraderAdapter(json_settings, credentials)
         else:
-            return MetaTraderMock()
+            return MetaTraderMock(json_settings, credentials)

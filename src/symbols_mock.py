@@ -1,14 +1,15 @@
 import numpy as np
 import pandas as pd
 from enum import Enum
-#import MetaTrader5 as mt5
+
+from src.interfaces import ISymbols
 
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
 
-class SymbolsMock():
+class SymbolsMock(ISymbols):
 
     ### Unique to Mock class ###
     candles_df_master: pd.DataFrame
@@ -25,25 +26,19 @@ class SymbolsMock():
     start_pos: int # how do we use start pos in mock?
     current_time: timezone # do we use this in mock ?
 
-    def __init__(self, symbol, timeframe, mock_location="pkg/candlesticks.csv"):
+    def __init__(self, symbol, timeframe, candles_mock_location="mock/candlesticks.csv", ticks_mock_location="mock/ticks.csv"):
         self.symbol = symbol
         self.timeframe = timeframe
         self.mt5_timeframe = self.get_mt5_timeframe(timeframe) # do we need this?
         self.start_pos = 0 # how do we use start pos in mock? # counter unique to mock 
         
-        self.candles_df_master = self.get_candlesticks_from_csv(mock_location)
+        self.ticks_df_master = self.get_ticks_from_csv(ticks_mock_location)
+        self.candles_df_master = self.get_candlesticks_from_csv(candles_mock_location)
         self.counter = Counter(self.candles_df_master)
 
     def set_symbol(self, symbol: str, timeframe: str) -> None:
         self.symbol = symbol
         self.timeframe = timeframe # do we use this in mock?
-
-    # unused
-    def set_candlesticks_start_pos(self, start_pos=0) -> None:
-        self.start_pos = start_pos # how do we use start pos in mock?
-        self.counter.__setindex__(start_pos) # counter unique to mock
-
-    # set ticks date method is open for implementation in mock
         
     def get_candlesticks(self, num_candlesticks) -> pd.DataFrame:
         interval = self.counter.__iter__()+num_candlesticks
@@ -54,32 +49,67 @@ class SymbolsMock():
         return self.candles_df
     
     def get_candlestick_time(self) -> int:
-        df = self.get_candlesticks(1) # this will present a problem for the indexer
+        df = self.get_candlesticks(1)
         self.counter.__previous__()
         rounded_candlestick_time = int(round(df.iloc[-1]['time']))
+        self.current_time = rounded_candlestick_time
         return rounded_candlestick_time
+    
+    def get_symbol_info_tick(self) -> dict:
+        rounded_candlestick_time = int(round(self.candles_df.iloc[-1]['time']))
+        tick_df = pd.DataFrame()
+        while (tick_df.empty):
+            tick_df = self.ticks_df_master.loc[self.ticks_df_master['time']==rounded_candlestick_time]
+            rounded_candlestick_time -= 1
+        tick = tick_df.to_dict('list')
+        return tick
 
-    # get ticks method is open for implementation in mock
+    def get_symbol_info_bid(self) -> float:
+        symbol_info_tick = self.get_symbol_info_tick()
+        symbol_info_bid = symbol_info_tick['bid'][0]
+        return symbol_info_bid
+
+    def get_symbol_info_ask(self) -> float:
+        symbol_info_tick = self.get_symbol_info_tick()
+        symbol_info_ask = symbol_info_tick['ask']
+        return symbol_info_ask
+
+    def get_ticks(self, num_ticks, current_time = 0) -> pd.DataFrame:
+        pass
+
+    def get_symbol_name(self) -> str:
+        return self.symbol
 
     ### Implementation unique to mock method ###
-    def get_candlesticks_from_csv(self, mock_location) -> pd.DataFrame:
+    # Get candlesticks master file
+    def get_candlesticks_from_csv(self, candles_mock_location) -> pd.DataFrame:
         """
-        Retrieves mock data from csv file in pkg directory.
-        :param mock_location: The path to the mock data which is stored in candlesticks (bar chart format) as a csv
+        Retrieves mock data from csv file in mock directory.
+        :param candles_mock_location: The path to the mock data which is stored in candlesticks (bar chart format) as a csv
         :return: The master dataframe with ALL mock data to be tested.
         """
-        candles_df_master = pd.read_csv(mock_location,index_col=0)
+        candles_df_master = pd.read_csv(candles_mock_location,index_col=0)
         return candles_df_master
     
-    def set_candles_df_master(self, mock_location) -> pd.DataFrame:
-        df = self.get_candlesticks_from_csv(mock_location)
+    # Get ticks master file
+    def get_ticks_from_csv(self, ticks_mock_location) -> pd.DataFrame:
+        """
+        
+        """
+        ticks_df_master = pd.read_csv(ticks_mock_location, index_col=0)
+        return ticks_df_master
+    
+    # change which mock candlesticks file is used
+    def set_candles_df_master(self, candles_mock_location) -> pd.DataFrame:
+        df = self.get_candlesticks_from_csv(candles_mock_location)
         self.candles_df_master = df
         return self.candles_df_master
 
-    ### IDEAS ###
-    # Generate mock data from symbol?
-    # Set symbol picks which csv file to test from
-    # Make iterator into its own class and/or method ?
+    # change which mock ticks file is used
+    def set_ticks_df_master(self, ticks_mock_location) -> pd.DataFrame:
+        df = self.get_ticks_from_csv(ticks_mock_location)
+        self.ticks_df_master = df
+        return self.ticks_df_master
 
     # unused
     def get_mt5_timeframe(self, timeframe: str):
@@ -93,28 +123,35 @@ class SymbolsMock():
             except KeyError as e:
                 print(f"{timeframe} is not a legal timeframe. {e}")
                 raise e
+            
+    # unused
+    def set_candlesticks_start_pos(self, start_pos=0) -> None:
+        self.start_pos = start_pos # how do we use start pos in mock?
+        self.counter.__setindex__(start_pos) # counter unique to mock
+
+    # set ticks date method is open for implementation in mock
 
 # unused
 class Timeframe(Enum):
-    one_minute  = 60
-    two_minutes  = 120
-    three_minutes  = 180
-    four_minutes  = 240
-    five_minutes  = 300
-    six_minutes  = 360
+    one_minute = 60
+    two_minutes = 120
+    three_minutes = 180
+    four_minutes = 240
+    five_minutes = 300
+    six_minutes = 360
     ten_minutes = 600
     twelve_minutes = 720
     fifteen_minutes = 900
     twenty_minutes = 1200
     thirty_minutes = 1800
     one_month = 2628000
-    one_hour  = 3600
-    two_hours  = 7200
-    three_hours  = 10800
-    four_hours  = 14400
-    six_hours  = 21600
-    eight_hours  = 28800
-    one_day  = 86400
+    one_hour = 3600
+    two_hours = 7200
+    three_hours = 10800
+    four_hours = 14400
+    six_hours = 21600
+    eight_hours = 28800
+    one_day = 86400
 
 class Counter():
     current_index: int

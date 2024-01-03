@@ -1,29 +1,23 @@
 
-from src.interfaces import IMetaTrader, SymbolsAdapter, Trade
+from src.interfaces import IMetaTrader
 
 class MetaTraderMock(IMetaTrader):
-    something: float
 
-    def __init__(self):
-        self.something = 0
+    json_settings: dict
+    credentials: dict    
+
+    def __init__(self, json_settings: dict, credentials: dict):
+        """
+        Initializes MetaTrader object
+        :param json_settings: A dict containing symbol trading details.
+        :param credentials: A dict containing MetaTrader5 login details.
+        """
+        self.json_settings = json_settings
+        self.credentials = credentials
 
     def connect(self) -> bool:
         # always happy
+        print("Trading bot initialized!")
+        print("Trading bot login successful!")
         return True
-
-    def get_seed(self) -> object:
-        return "Seed"
-
-    def get_next(self) -> object:
-        return "Next"
-
-    def get_candlesticks(self) -> SymbolsAdapter:
-        c = SymbolsAdapter()
-        return c
-    
-    def check_if_next(self) -> bool:
-        return True
-
-    def execute_trade(self, trade: Trade):
-        return "Traded!"
     

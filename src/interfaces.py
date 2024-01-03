@@ -1,19 +1,10 @@
-
 import abc
-from src.symbols_adapter import SymbolsAdapter
-
-class Trade(object):
-    pass
 
 # Meta trade interface - to abstract away and isolate MetaTrader SDK calls
 class IMetaTrader(abc.ABC):
 
     @abc.abstractmethod
     def connect(self) -> bool:
-        pass
-
-    @abc.abstractmethod
-    def execute_trade(self, trade: Trade) -> str:
         pass
 
 class IStrategy(abc.ABC):
@@ -29,8 +20,27 @@ class IStrategy(abc.ABC):
     @abc.abstractmethod
     def check_next(self) -> bool:
         pass
-
+    
+    """
     @abc.abstractmethod
     def check_signal(self) -> bool:
         pass
+    """
+
+class ISymbols(abc.ABC):
     
+    @abc.abstractmethod
+    def get_candlesticks(self, num_candlesticks) -> object:
+        pass
+
+    @abc.abstractmethod
+    def get_candlestick_time(self) -> int:
+        pass
+
+    @abc.abstractmethod
+    def get_symbol_info_tick(self) -> dict:
+        pass
+
+    
+
+

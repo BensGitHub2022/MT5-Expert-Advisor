@@ -1,7 +1,7 @@
 
 import threading
 import time
-from src.interfaces import IStrategy, IMetaTrader, Trade 
+from src.interfaces import IStrategy, IMetaTrader
 
 class TradeBot(object):
     
@@ -45,9 +45,8 @@ class TradeBot(object):
 
             # ask strategy what it wants to do
         
-            t = Trade()
-            res = self.meta_trader.execute_trade(t)
-            print(res + " .. " + str(n))
+            result = "Traded!"
+            print(result + " .. " + str(n))
             time.sleep(2)
             n = n + 1
         return

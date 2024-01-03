@@ -3,11 +3,13 @@ import pandas as pd
 from enum import Enum
 import MetaTrader5 as mt5
 
+from src.interfaces import ISymbols
+
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
-class SymbolsAdapter():
+class SymbolsAdapter(ISymbols):
 
     candles: np.array
     candles_df: pd.DataFrame
@@ -16,11 +18,9 @@ class SymbolsAdapter():
     mt5_timeframe: int
     timeframe: str
     start_pos: int
+    
+    # used only by ticks retrieval method, not the same as candlestick/system time inside EmaStrategy object
     current_time: timezone
-
-    # unused
-    num_candlesticks: int
-    num_ticks: int
 
     def __init__(self, symbol: str, timeframe: str) -> None:
         self.symbol = symbol
@@ -31,18 +31,6 @@ class SymbolsAdapter():
     def set_symbol(self, symbol: str, timeframe: str) -> None:
         self.symbol = symbol
         self.timeframe = timeframe
-
-    def set_candlesticks_start_pos(self, start_pos=0) -> None:
-        self.start_pos = start_pos
-
-    def set_ticks_date(self,current_time=0) -> None:
-        if (current_time != 0):
-            # tz_UTC = pytz.timezone('GMT')
-            offset = timedelta(hours=2.0)
-            tz_UTC_offset = timezone(offset,'GMT')
-            self.current_time = datetime.now(tz_UTC_offset)
-        else:
-            self.current_time = 0
 
     def get_candlesticks(self, num_candlesticks) -> pd.DataFrame:
         self.candles = mt5.copy_rates_from_pos(self.symbol, self.mt5_timeframe, self.start_pos, num_candlesticks)
@@ -57,12 +45,39 @@ class SymbolsAdapter():
     def get_symbol_info(self) -> bool:
         symbol_info = mt5.symbol_info(self.symbol)._asdict()
         return symbol_info
+    
+    def get_symbol_pip_size(self) -> float:
+        symbol_info = self.get_symbol_info()
+        trade_tick_size = symbol_info['trade_tick_size']
+        return trade_tick_size
 
-    def get_ticks(self, num_ticks, current_time = 0) -> bool:
+    def get_symbol_contract_size(self) -> float:
+        symbol_info = self.get_symbol_info()
+        trade_contract_size = symbol_info['trade_contract_size']
+        return trade_contract_size
+    
+    def get_symbol_info_tick(self) -> dict:
+        symbol_info_tick = mt5.symbol_info_tick(self.symbol)._asdict()
+        return symbol_info_tick
+    
+    def get_symbol_info_bid(self) -> float:
+        symbol_info_tick = self.get_symbol_info_tick()
+        symbol_info_bid = symbol_info_tick['bid']
+        return symbol_info_bid
+
+    def get_symbol_info_ask(self) -> float:
+        symbol_info_tick = self.get_symbol_info_tick()
+        symbol_info_ask = symbol_info_tick['ask']
+        return symbol_info_ask
+
+    def get_ticks(self, num_ticks, current_time = 0) -> pd.DataFrame:
         self.current_time = current_time
         ticks = mt5.copy_ticks_from(self.symbol, self.current_time, num_ticks, mt5.COPY_TICKS_ALL)
         ticks_df = pd.DataFrame(ticks)
         return ticks_df
+    
+    def get_symbol_name(self) -> str:
+        return self.symbol
 
     def get_mt5_timeframe(self, timeframe: str):
         """
@@ -75,24 +90,39 @@ class SymbolsAdapter():
         except KeyError as e:
             print(f"{timeframe} is not a legal timeframe. {e}")
             raise e
+        
+    ### These setter methods are not relied upon for the strategy ###
+    # Adjusts which candle you want to start from 
+    def set_candlesticks_start_pos(self, start_pos=0) -> None:
+        self.start_pos = start_pos
+
+    # Adjust which time you want to start tick retrieval from
+    def set_ticks_date(self,current_time=0) -> None:
+        if (current_time != 0):
+            # tz_UTC = pytz.timezone('GMT')
+            offset = timedelta(hours=2.0)
+            tz_UTC_offset = timezone(offset,'GMT')
+            self.current_time = datetime.now(tz_UTC_offset)
+        else:
+            self.current_time = 0
 
 class Timeframe(Enum):
-    one_minute  = mt5.TIMEFRAME_M1
-    two_minutes  = mt5.TIMEFRAME_M2
-    three_minutes  = mt5.TIMEFRAME_M3
-    four_minutes  = mt5.TIMEFRAME_M4
-    five_minutes  = mt5.TIMEFRAME_M5
-    six_minutes  = mt5.TIMEFRAME_M6
+    one_minute = mt5.TIMEFRAME_M1
+    two_minutes = mt5.TIMEFRAME_M2
+    three_minutes = mt5.TIMEFRAME_M3
+    four_minutes = mt5.TIMEFRAME_M4
+    five_minutes = mt5.TIMEFRAME_M5
+    six_minutes = mt5.TIMEFRAME_M6
     ten_minutes = mt5.TIMEFRAME_M10
     twelve_minutes = mt5.TIMEFRAME_M12
     fifteen_minutes = mt5.TIMEFRAME_M15
     twenty_minutes = mt5.TIMEFRAME_M20
     thirty_minutes = mt5.TIMEFRAME_M30
     one_month = mt5.TIMEFRAME_MN1
-    one_hour  = mt5.TIMEFRAME_H1
-    two_hours  = mt5.TIMEFRAME_H2
-    three_hours  = mt5.TIMEFRAME_H3
-    four_hours  = mt5.TIMEFRAME_H4
-    six_hours  = mt5.TIMEFRAME_H6
-    eight_hours  = mt5.TIMEFRAME_H8
-    one_day  = mt5.TIMEFRAME_D1
+    one_hour = mt5.TIMEFRAME_H1
+    two_hours = mt5.TIMEFRAME_H2
+    three_hours = mt5.TIMEFRAME_H3
+    four_hours = mt5.TIMEFRAME_H4
+    six_hours = mt5.TIMEFRAME_H6
+    eight_hours = mt5.TIMEFRAME_H8
+    one_day = mt5.TIMEFRAME_D1

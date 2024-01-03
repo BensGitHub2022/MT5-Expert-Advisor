@@ -1,31 +1,27 @@
 import MetaTrader5 as mt5
 import pandas as pd
 
-from src.interfaces import IMetaTrader, Trade
-from src.symbols_adapter import SymbolsAdapter
-from src.json_reader import JsonReader
+from src.interfaces import IMetaTrader
 
-class MetaTraderAdapter(IMetaTrader):
-    something: float
-
-    symbol: str 
-    timeframe: str 
+class MetaTraderAdapter(IMetaTrader): 
 
     json_settings: dict
     credentials: dict
 
-    def __init__(self):
-        self.something = 0
-
-    def connect(self, json_settings: dict, credentials: dict) -> bool:
+    def __init__(self, json_settings: dict, credentials: dict):
         """
-        Attempts to initialize and log into MetaTrader5.
-        :param json_settings: A dict containing MetaTrader5 login details.
-        :returns bool: True if initialization and login succeeds. Otherwise, false.
+        Initializes MetaTrader object
+        :param json_settings: A dict containing symbol trading details.
+        :param credentials: A dict containing MetaTrader5 login details.
         """
-        
         self.json_settings = json_settings
         self.credentials = credentials
+
+    def connect(self) -> bool:
+        """
+        Attempts to initialize and log into MetaTrader5.
+        :returns bool: True if initialization and login succeeds. Otherwise, false.
+        """
 
         try:
             pathway = self.credentials["mt5"]["terminal_pathway"]
@@ -63,6 +59,3 @@ class MetaTraderAdapter(IMetaTrader):
             raise e
         
         return True
-
-    def execute_trade(self, trade: Trade):
-        return "Traded!"

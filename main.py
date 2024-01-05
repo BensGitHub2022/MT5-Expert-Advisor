@@ -1,15 +1,10 @@
-from src.json_reader import JsonReader
+from src import MetaTraderConnection
 from src.trade_bot import TradeBot
 from src.ema_strategy import EmaStrategy
 from src.symbols_factory import SymbolsFactory
-from src.meta_trader_factory import MetaTraderFactory
 from src.trade_execution_adapter import TradeExecutorAdapter
 
 import pandas as pd
-
-# Path to MetaTrader5 login details.
-ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
-CREDENTIALS_FILE_PATH = "pkg/credentials.json"
 
 CANDLES_MOCK_LOCATION = "mock/candlesticks_current.csv"
 TICKS_MOCK_LOCATION = "mock/ticks_current.csv"
@@ -22,22 +17,18 @@ NEXT = 1
 
 def main():
     print("Hello Trade Bot!")
+    use_real_data = True
+    
+    if use_real_data:
+        meta_trader_connection = MetaTraderConnection()
+        meta_trader_connection.get_data_for_symbol()
+
 
     # Composition root
     pd.set_option('display.max_columns', None)
 
-    json_settings = JsonReader(ACCOUNT_SETTINGS_PATH)
-    symbol = json_settings.get_symbol()
-    timeframe = json_settings.get_timeframe()
-
-    credentials = JsonReader(CREDENTIALS_FILE_PATH)
-
-    meta_trader_factory = MetaTraderFactory(production=False)
-    meta_trader = meta_trader_factory.create_meta_trader(json_settings.get_json_data(),credentials.get_json_data())
-    meta_trader.connect()
-
-    strategy = EmaStrategy(symbol,timeframe,EMA_SHORT,EMA_LONG)
-    action_writer = strategy.get_action_writer()
+    strategy = EmaStrategy(symbol, timeframe, EMA_SHORT,EMA_LONG)
+    # action_writer = strategy.get_action_writer()
     
     symbol_factory = SymbolsFactory(production=False)
     symbol = symbol_factory.create_symbol(symbol,timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION) # Mock
@@ -55,8 +46,8 @@ def main():
     
     print(symbol.get_symbol_info_bid())
 
-    strategy.record_action()
-    action_writer.print_action()
+    # strategy.record_action()
+    # action_writer.print_action()
     
     while (True):
         if(strategy.check_next(symbol.get_candlestick_time())):
@@ -75,8 +66,8 @@ def main():
                 case 0:
                     trade_executor.do_nothing()
             """     
-            strategy.record_action()
-            action_writer.print_action()
+            # strategy.record_action()
+            # action_writer.print_action()
     
 
     """

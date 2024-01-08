@@ -1,8 +1,9 @@
 import MetaTrader5 as mt5
 import pandas as pd
-from src.JsonReader import JsonReader
+from src.Connections.ConnectionInterface import ConnectionInterface
+import JsonReader
 
-class MetaTraderConnection():
+class MetaTraderConnection(ConnectionInterface):
     # Paths to MetaTrader5 login details.
     credentials = JsonReader("pkg/credentials.json")
     json_settings = JsonReader("pkg/settings.json")
@@ -65,10 +66,17 @@ class MetaTraderConnection():
         ticks = mt5.copy_ticks_from(symbol, self.current_time, num_ticks, mt5.COPY_TICKS_ALL)
         return pd.DataFrame(ticks)
     
+    def get_symbol_info(self, symbol) -> str:
+        return mt5.symbol_info(symbol)._asdict()
+    
     def send_order():
         # to-do
         return 0
     
     def cancel_order():
+        #to-do
+        return 0
+    
+    def get_account_balance() -> int:
         #to-do
         return 0

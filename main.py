@@ -1,27 +1,30 @@
-from src import MetaTraderConnection
+from src.Connections.ConnectionInterface import ConnectionInterface
+from src.Connections.Mock.MockConnection import MockConnection
+from src.Connections.MT5.MetaTraderConnection import MetaTraderConnection
 from src.trade_bot import TradeBot
-from src.ema_strategy import EmaStrategy
+from src.TradingStrategies.ema_strategy import EmaStrategy
 from src.symbols_factory import SymbolsFactory
 from src.trade_execution_adapter import TradeExecutorAdapter
 
 import pandas as pd
 
-CANDLES_MOCK_LOCATION = "mock/candlesticks_current.csv"
-TICKS_MOCK_LOCATION = "mock/ticks_current.csv"
-
 EMA_SHORT = 5
 EMA_LONG = 8
 
-INTERVAL = EMA_LONG+1
+INTERVAL = EMA_LONG + 1
 NEXT = 1
+
+USE_REAL_DATA = True
 
 def main():
     print("Hello Trade Bot!")
-    use_real_data = True
     
-    if use_real_data:
-        meta_trader_connection = MetaTraderConnection()
-        meta_trader_connection.get_data_for_symbol()
+    connection: ConnectionInterface
+    
+    if USE_REAL_DATA:
+        connection = MetaTraderConnection()
+    else:
+        connection = MockConnection()
 
 
     # Composition root

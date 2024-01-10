@@ -4,13 +4,6 @@ from src.Connections.ConnectionInterface import ConnectionInterface
 from src.Connections.Mock.MockDataSource import MockDataSource
 
 class MockConnection(ConnectionInterface):
-    _connection = None;
-
-    def __new__(cls):
-        if cls._connection is None:
-            cls._connection = super(MockConnection, cls).__new__(cls)
-        return cls._connnection
-    
     def __init__(self):
         self.connect()
     

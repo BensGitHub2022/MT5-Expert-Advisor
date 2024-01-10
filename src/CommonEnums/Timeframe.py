@@ -1,0 +1,22 @@
+from enum import Enum, auto
+
+class Timeframe(Enum):
+    one_minute = auto()
+    two_minutes = auto()
+    three_minutes = auto()
+    four_minutes = auto()
+    five_minutes = auto()
+    six_minutes = auto()
+    ten_minutes = auto()
+    twelve_minutes = auto()
+    fifteen_minutes = auto()
+    twenty_minutes = auto()
+    thirty_minutes = auto()
+    one_month = auto()
+    one_hour = auto()
+    two_hours = auto()
+    three_hours = auto()
+    four_hours = auto()
+    six_hours = auto()
+    eight_hours = auto()
+    one_day = auto()

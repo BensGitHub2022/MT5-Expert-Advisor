@@ -3,8 +3,7 @@ from src.Connections.Mock.MockConnection import MockConnection
 from src.Connections.MT5.MetaTraderConnection import MetaTraderConnection
 from src.trade_bot import TradeBot
 from src.TradingStrategies.ema_strategy import EmaStrategy
-from src.symbols_factory import SymbolsFactory
-from src.trade_execution_adapter import TradeExecutorAdapter
+from src.CommonEnums.Timeframe import Timeframe
 
 import pandas as pd
 
@@ -15,6 +14,10 @@ INTERVAL = EMA_LONG + 1
 NEXT = 1
 
 USE_REAL_DATA = True
+SYMBOL = "BCHUSD"
+TIMEOUT = 60000
+TIMEFRAME = Timeframe.one_minute
+NUM_CANDLESTICKS = 20
 
 def main():
     print("Hello Trade Bot!")
@@ -26,35 +29,23 @@ def main():
     else:
         connection = MockConnection()
 
-
     # Composition root
     pd.set_option('display.max_columns', None)
 
-    strategy = EmaStrategy(symbol, timeframe, EMA_SHORT,EMA_LONG)
-    # action_writer = strategy.get_action_writer()
-    
-    symbol_factory = SymbolsFactory(production=False)
-    symbol = symbol_factory.create_symbol(symbol,timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION) # Mock
-    # symbol = symbol_factory.create_symbol(symbol,timeframe) # Production
-    print("Using the " + strategy.get_strategy_name() + ", trading on " + symbol.get_symbol_name())
-    # print(symbol.get_symbol_info()) # Need to implement in mock!
+    strategy = EmaStrategy(SYMBOL, TIMEFRAME, EMA_SHORT, EMA_LONG)
 
-    #trade_executor = TradeExecutorAdapter()
+    print("Using the " + strategy.get_strategy_name() + ", trading on " + SYMBOL)
     
-    #positions = trade_executor.get_positions()
-    #print(positions)
-    
-    strategy.set_current_candlestick_time(symbol.get_candlestick_time())
-    strategy.process_seed(symbol.get_candlesticks(INTERVAL))
-    
-    print(symbol.get_symbol_info_bid())
+    first_candlestick_set = connection.get_candles_for_symbol(SYMBOL, TIMEFRAME, NUM_CANDLESTICKS)
+    time = int(round(first_candlestick_set.iloc[-1]['time']))
 
-    # strategy.record_action()
-    # action_writer.print_action()
-    
+    strategy.set_current_candlestick_time(time)
+    strategy.process_seed(first_candlestick_set)
+
     while (True):
-        if(strategy.check_next(symbol.get_candlestick_time())):
-            strategy.process_next(symbol.get_candlesticks(NEXT))
+        candlestick_set = connection.get_candles_for_symbol(SYMBOL, TIMEFRAME, NUM_CANDLESTICKS)
+        if(int(round(first_candlestick_set.iloc[-1]['time']))):
+            strategy.process_next(candlestick_set)
             signal = strategy.check_signal()
             """
             match signal.get('action'):

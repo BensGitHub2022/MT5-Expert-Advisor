@@ -2,13 +2,10 @@ import os
 import json
 
 class JsonReader(object):
-
-    file_path: str
     json_data: dict
 
     def __init__(self, file_path: str) -> None:
-        self.file_path = file_path
-        self.json_data = self.get_json_from_file(self.file_path)
+        self.json_data = self.get_json_from_file(file_path)
 
     def get_json_from_file(self, file_path: str) -> dict:
         """

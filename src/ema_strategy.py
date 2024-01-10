@@ -7,7 +7,7 @@ from datetime import timedelta
 from datetime import timezone
 
 from src.interfaces import IStrategy
-from src.action_writer import ActionWriter
+# from src.action_writer import ActionWriter
 
 SMOOTHENING = 2
 
@@ -34,7 +34,7 @@ class EmaStrategy(IStrategy):
     action: int # action based on signal analysis as an integer {1, -1, 0}
     signal: dict # signal from signal analysis as a dict {'action': 1/-1/0, 'action_str'; "buy"/"sell"/"no signal"}
 
-    action_writer: object # records all activity processed by the strategy, see action writer class
+    # action_writer: object # records all activity processed by the strategy, see action writer class
 
     initialized: bool
     frequency: int
@@ -68,7 +68,7 @@ class EmaStrategy(IStrategy):
         self.action_str = ''
         self.signal = {'action': self.action, 'action_str': self.action_str}
 
-        self.action_writer = ActionWriter()
+        # self.action_writer = ActionWriter()
         self.initialized = False
         self.frequency = 500
         self.duration = 2000
@@ -155,14 +155,14 @@ class EmaStrategy(IStrategy):
 
         return self.signal
     
-    def record_action(self) -> bool:
-        if(not self.initialized):
-            self.action_writer.record_action(self.df, self.action_df)
-            self.initialized = True
-        else:
-            self.action_writer.record_action(self.df.tail(1), self.action_df.tail(1))
+    # def record_action(self) -> bool:
+    #     if(not self.initialized):
+    #         self.action_writer.record_action(self.df, self.action_df)
+    #         self.initialized = True
+    #     else:
+    #         self.action_writer.record_action(self.df.tail(1), self.action_df.tail(1))
 
-        self.action_writer.write_action()
+    #     self.action_writer.write_action()
 
         return True
 
@@ -190,8 +190,8 @@ class EmaStrategy(IStrategy):
     def get_action_df(self) -> pd.DataFrame:
         return self.action_df
     
-    def get_action_writer(self) -> object:
-        return self.action_writer
+    # def get_action_writer(self) -> object:
+    #     return self.action_writer
 
     def get_signal(self) -> dict:
         return self.signal

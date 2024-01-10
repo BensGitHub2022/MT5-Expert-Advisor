@@ -4,6 +4,8 @@ from src.Connections.ConnectionInterface import ConnectionInterface
 from src.Connections.Mock.MockDataSource import MockDataSource
 
 class MockConnection(ConnectionInterface):
+    symbol_tracker_map = {}
+
     def __init__(self):
         self.connect()
     
@@ -16,11 +18,11 @@ class MockConnection(ConnectionInterface):
         print("Trading bot login successful!")
         return True
     
-    def get_candles_for_symbol(self, symbol, timeframe, _num_candlesticks) -> pd.DataFrame:
+    def get_candles_for_symbol(self, symbol, timeframe, num_candlesticks) -> pd.DataFrame:
         if symbol not in self.symbol_tracker_map:
             self.symbol_tracker_map[symbol] = MockDataSource(symbol, timeframe)
     
-        return self.symbol_tracker_map[symbol].get_next_candle_set()
+        return self.symbol_tracker_map[symbol].get_next_candle_set(num_candlesticks)
         
     def get_ticks_for_symbol(self, symbol, num_ticks) -> pd.DataFrame:
         if symbol not in self.symbol_tracker_map:

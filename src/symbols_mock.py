@@ -24,6 +24,7 @@ class SymbolsMock(ISymbols):
     mt5_timeframe: int # do we use this in mock ?
     timeframe: str # do we use this in mock ?
     start_pos: int # how do we use start pos in mock?
+
     current_time: timezone # do we use this in mock ?
 
     def __init__(self, symbol, timeframe, candles_mock_location="mock/candlesticks.csv", ticks_mock_location="mock/ticks.csv"):

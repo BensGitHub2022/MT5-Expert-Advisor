@@ -6,10 +6,13 @@ RISK = .02
 
 class TradeExecutorAdapter():
 
-    current_balance: float
+    current_balance: float # in mock implementation we track an account variable. Maybe we should do that here too
+
     current_risk_per_trade: float 
     current_lot_size: float
     
+    current_profit: float # have we defined yet?
+
     positions: dict
     positions_df: pd.DataFrame # necessary ? (Note: the presentation of the dataframe is easier to read but dict is easier to work with)
 
@@ -17,7 +20,7 @@ class TradeExecutorAdapter():
         self.current_risk_per_trade = 0.0
         self.current_lot_size = 0.0
         self.current_balance = self.get_account_balance()
-        self.positions_df = pd.DataFrame()    
+        # self.positions_df = pd.DataFrame() # Not used
 
     def calc_risk_per_trade(self) -> float:
         self.current_risk_per_trade = self.current_balance * RISK
@@ -117,7 +120,7 @@ class TradeExecutorAdapter():
     def close_all_positions(self, bid, ask, deviation) -> bool:
         positions = self.get_positions()
         for position in positions:
-            self.close_position(position,bid, ask, deviation)
+            self.close_position(position, bid, ask, deviation)
             
     # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame
     """

@@ -13,7 +13,7 @@ EMA_LONG = 8
 INTERVAL = EMA_LONG + 1
 NEXT = 1
 
-USE_REAL_DATA = False
+USE_REAL_DATA = True
 SYMBOL = "BCHUSD"
 TIMEOUT = 60000
 TIMEFRAME = Timeframe.one_minute
@@ -29,7 +29,7 @@ def main():
     else:
         connection = MockConnection()
 
-    # Composition root
+    # Composition root - why is this done here?
     pd.set_option('display.max_columns', None)
 
     strategy = EmaStrategy(SYMBOL, TIMEFRAME, EMA_SHORT, EMA_LONG)
@@ -44,7 +44,9 @@ def main():
 
     while (True):
         candlestick_set = connection.get_candles_for_symbol(SYMBOL, TIMEFRAME, NUM_CANDLESTICKS)
+        # why are we doing this check? Is it just for mocks?
         if(int(round(first_candlestick_set.iloc[-1]['time']))):
+            print("got new candlestick set")
             strategy.process_next(candlestick_set)
             signal = strategy.check_signal()
             """

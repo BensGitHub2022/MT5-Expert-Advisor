@@ -140,6 +140,7 @@ class EmaStrategy(IStrategy):
             self.action_str = "buy"
             self.action = 1
             self.signal = {'action': self.action, 'action_str': self.action_str}
+            print('buying')
             winsound.Beep(self.frequency, self.duration)
 
         #sell if short ema crosses below long ema

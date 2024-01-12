@@ -26,16 +26,24 @@ class MetaTraderConnection(ConnectionInterface):
             server = self.credentials["mt5"]["server"]
             timeout = self.json_settings["mt5"]["timeout"]
 
-            mt5.initialize(
+            initialized = mt5.initialize(
                 pathway, login=login, password=password, server=server, timeout=timeout
             )
-            print("Trading bot initialized!")
+
+            if initialized:
+                print("Trading bot initialized!")
+            else:
+                raise ConnectionError
 
             # Safe to login here. Returns true if login succeeds. Otherwise, returns false.
-            mt5.login(
+            logged_in = mt5.login(
                 login=login, password=password, server=server, timeout=timeout
             )
-            print("Trading bot login successful!")
+
+            if logged_in:
+                print("Trading bot login successful!")
+            else:
+                raise PermissionError
 
         except KeyError as e:
             print(f"The queried dictionary key does not exist: {e.args}")
@@ -50,7 +58,8 @@ class MetaTraderConnection(ConnectionInterface):
     def get_candles_for_symbol(self, symbol, timeframe, num_candlesticks) -> pd.DataFrame:
         try:
             if timeframe == Timeframe.one_minute:
-                return pd.DataFrame(mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M1, 0, num_candlesticks))
+                candles = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M1, 0, num_candlesticks)
+                return pd.DataFrame(candles)
             return None
         except Exception as e:
             print(e)

@@ -2,7 +2,7 @@ from src.json_reader import JsonReader
 from src.trade_bot import TradeBot
 from src.ema_strategy import EmaStrategy
 from src.symbols_factory import SymbolsFactory
-from src.context_factory import MetaTraderFactory
+from src.context_factory import ContextFactory
 from src.trade_execution_mt5 import TradeExecutorMT5
 
 import pandas as pd
@@ -32,7 +32,7 @@ def main():
 
     credentials = JsonReader(CREDENTIALS_FILE_PATH)
 
-    meta_trader_factory = MetaTraderFactory(production=True)
+    meta_trader_factory = ContextFactory(production=True)
     meta_trader = meta_trader_factory.create_meta_trader(json_settings.get_json_data(),credentials.get_json_data())
     meta_trader.connect()
 

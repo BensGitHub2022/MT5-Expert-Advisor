@@ -1,7 +1,7 @@
 import abc
 
 # Meta trade interface - to abstract away and isolate MetaTrader SDK calls
-class IMetaTrader(abc.ABC):
+class IContext(abc.ABC):
 
     @abc.abstractmethod
     def connect(self) -> bool:

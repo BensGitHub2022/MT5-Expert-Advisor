@@ -1,13 +1,13 @@
 
 import threading
 import time
-from src.interfaces import IStrategy, IMetaTrader
+from src.interfaces import IStrategy, IContext
 
 class TradeBot(object):
     
     # instance variables (passed in the constructor)
     strategy: IStrategy
-    meta_trader: IMetaTrader
+    meta_trader: IContext
 
     # instance variables (created internally)
     thread: threading.Thread
@@ -16,7 +16,7 @@ class TradeBot(object):
     def __init__(
             self,
             strategy: IStrategy,
-            meta_trader: IMetaTrader):
+            meta_trader: IContext):
         self.strategy = strategy
         self.meta_trader = meta_trader
         self.thread = threading.Thread(target=trade_bot_thread_func, args=(self,))

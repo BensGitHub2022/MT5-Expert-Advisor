@@ -9,7 +9,7 @@ from datetime import timedelta
 from datetime import timezone
 
 
-class SymbolsMock(ISymbols):
+class SymbolsSimulator(ISymbols):
 
     ### Unique to Mock class ###
     candles_df_master: pd.DataFrame

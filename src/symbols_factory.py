@@ -1,7 +1,7 @@
 
 from src.interfaces import ISymbols
 from src.symbols_mt5 import SymbolsMT5
-from src.symbols_sim import SymbolsMock
+from src.symbols_sim import SymbolsSimulator
 
 class SymbolsFactory():
 
@@ -14,4 +14,4 @@ class SymbolsFactory():
         if (self.production):
             return SymbolsMT5(symbol, timeframe)
         else:
-            return SymbolsMock(symbol, timeframe, candles_mock_location, ticks_mock_location)
+            return SymbolsSimulator(symbol, timeframe, candles_mock_location, ticks_mock_location)

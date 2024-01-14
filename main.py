@@ -3,7 +3,8 @@ from src.trade_bot import TradeBot
 from src.ema_strategy import EmaStrategy
 from src.symbols_factory import SymbolsFactory
 from src.context_factory import ContextFactory
-from src.trade_execution_mt5 import TradeExecutorMT5
+from src.account_factory import AccountFactory
+from src.trade_execution_factory import TradeExecutionFactory
 
 import pandas as pd
 
@@ -33,7 +34,7 @@ def main():
     credentials = JsonReader(CREDENTIALS_FILE_PATH)
 
     meta_trader_factory = ContextFactory(production=True)
-    meta_trader = meta_trader_factory.create_meta_trader(json_settings.get_json_data(),credentials.get_json_data())
+    meta_trader = meta_trader_factory.create_context(json_settings.get_json_data(),credentials.get_json_data())
     meta_trader.connect()
 
     strategy = EmaStrategy(symbol,timeframe,EMA_SHORT,EMA_LONG)
@@ -45,9 +46,13 @@ def main():
     print("Using the " + strategy.get_strategy_name() + ", trading on " + symbol.get_symbol_name())
     # print(symbol.get_symbol_info()) # Need to implement in mock!
 
-    trade_executor = TradeExecutorMT5()
+    account_factory = AccountFactory(production=True)
+    account = account_factory.create_account()
+
+    trade_execution_factory = TradeExecutionFactory(production=True)
+    trade_executor = trade_execution_factory.create_trade_executor(account)
     
-    positions = trade_executor.get_positions()
+    positions = account.get_positions()
     print(positions)
     
     strategy.set_current_candlestick_time(symbol.get_candlestick_time())
@@ -65,11 +70,11 @@ def main():
             
             match signal.get('action'):
                 case 1:
-                    if(trade_executor.get_positions()):
+                    if(account.get_positions()):
                         trade_executor.close_all_positions(symbol.get_symbol_info_bid(), symbol.get_symbol_info_ask(),20)
                     trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_ask(),20) 
                 case -1:
-                    if(trade_executor.get_positions()):
+                    if(account.get_positions()):
                         trade_executor.close_all_positions(symbol.get_symbol_info_bid(), symbol.get_symbol_info_ask(),20)
                     trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_bid(),20) 
                 case 0:

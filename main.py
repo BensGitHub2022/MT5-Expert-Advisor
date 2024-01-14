@@ -2,8 +2,8 @@ from src.json_reader import JsonReader
 from src.trade_bot import TradeBot
 from src.ema_strategy import EmaStrategy
 from src.symbols_factory import SymbolsFactory
-from src.meta_trader_factory import MetaTraderFactory
-from src.trade_execution_adapter import TradeExecutorAdapter
+from src.context_factory import MetaTraderFactory
+from src.trade_execution_mt5 import TradeExecutorMT5
 
 import pandas as pd
 
@@ -45,7 +45,7 @@ def main():
     print("Using the " + strategy.get_strategy_name() + ", trading on " + symbol.get_symbol_name())
     # print(symbol.get_symbol_info()) # Need to implement in mock!
 
-    trade_executor = TradeExecutorAdapter()
+    trade_executor = TradeExecutorMT5()
     
     positions = trade_executor.get_positions()
     print(positions)

@@ -9,7 +9,7 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
-class SymbolsAdapter(ISymbols):
+class SymbolsMT5(ISymbols):
 
     candles: np.array
     candles_df: pd.DataFrame

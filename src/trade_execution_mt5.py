@@ -4,7 +4,7 @@ from enum import Enum
 
 RISK = .02
 
-class TradeExecutorAdapter():
+class TradeExecutorMT5():
 
     current_balance: float # in mock implementation we track an account variable. Maybe we should do that here too
 

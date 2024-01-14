@@ -3,7 +3,7 @@ import pandas as pd
 
 from src.interfaces import IMetaTrader
 
-class MetaTraderAdapter(IMetaTrader): 
+class ContextMT5(IMetaTrader): 
 
     json_settings: dict
     credentials: dict

@@ -6,7 +6,7 @@ from datetime import timezone
 
 RISK = .02
 
-class TradeExecutorAdapter():
+class TradeExecutorSimulator():
 
     current_risk_per_trade: float 
     current_lot_size: float

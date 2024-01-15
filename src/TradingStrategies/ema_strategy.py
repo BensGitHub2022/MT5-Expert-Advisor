@@ -17,9 +17,6 @@ class EmaStrategy(IStrategy):
     # [1] This gets instantiated, is helpful for debugging, but not heavily used
     # [2] Was helpful for understanding a concept but is not relied upon
 
-    symbol: str # passed to the class at initialization
-    timeframe: str # passed to the class at initialization
-
     previous_df: pd.DataFrame # the previous rolling candlestick window used to calc EMAs (Note: this is used for debugging but not heavily relied upon [1])
     df: pd.DataFrame # the current rolling candlestick window used to calc EMAs
     new_candle_df: pd.DataFrame # the next candlestick added to the rolling window to calc new EMAs 
@@ -47,17 +44,13 @@ class EmaStrategy(IStrategy):
     # This is relied upon and essential to the strategy
     current_candlestick_time: int # Current candlestick time pulled from the most recent candlestick
 
-    def __init__(self, symbol: str, timeframe:str, ema_short:int, ema_long:int) -> None:
+    def __init__(self, ema_short:int, ema_long:int) -> None:
         """
         Constructor for EmaStrategy
-        :param symbol: the symbol which is the focus of the ema strategy, passed as a string
-        :param timeframe: the period used by the strategy (i.e., minute, five-minute, etc), passed as a string
         :param ema_short: the window of the short-term EMA, passed as an integer
         :param ema_short: the window of the long-term EMA, passed as an integer
         :return: None
         """
-        self.symbol = symbol
-        self.timeframe = timeframe
         self.ema_short = ema_short
         self.ema_long = ema_long
         self.ema_short_weighting = SMOOTHENING/(ema_short+1)
@@ -140,7 +133,6 @@ class EmaStrategy(IStrategy):
             self.action_str = "buy"
             self.action = 1
             self.signal = {'action': self.action, 'action_str': self.action_str}
-            print('buying')
             winsound.Beep(self.frequency, self.duration)
 
         #sell if short ema crosses below long ema
@@ -172,12 +164,6 @@ class EmaStrategy(IStrategy):
 
     def get_ema_long(self) -> int:
         return self.ema_long
-    
-    def get_symbol(self) -> str:
-        return self.symbol
-    
-    def get_timeframe(self) -> str:
-        return self.timeframe
     
     def get_dataframe(self) -> pd.DataFrame:
         return self.df

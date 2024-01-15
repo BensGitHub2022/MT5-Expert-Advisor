@@ -1,7 +1,7 @@
 from enum import Enum
-from src.CommonEnums.OrderType import OrderType
-from src.CommonEnums.Timeframe import Timeframe
-from src.CommonEnums.TradeAction import TradeAction
+from src.Enums.OrderType import OrderType
+from src.Enums.Timeframe import Timeframe
+from src.Enums.TradeAction import TradeAction
 import MetaTrader5 as mt5
 
 class MetaTraderEnumConverters:

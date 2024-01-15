@@ -1,10 +1,11 @@
 import pandas as pd
 
-from src.Connections.ConnectionInterface import ConnectionInterface
+from src.Connections.AbstractConnection import AbstractConnection
 from src.Connections.Mock.MockDataSource import MockDataSource
 
-class MockConnection(ConnectionInterface):
-    symbol_tracker_map = {}
+class MockConnection(AbstractConnection):
+    symbol_candle_tracker_map = {}
+    symbol_tick_tracker_map = {}
 
     def __init__(self):
         self.connect()
@@ -19,25 +20,29 @@ class MockConnection(ConnectionInterface):
         return True
     
     def get_candles_for_symbol(self, symbol, timeframe, num_candlesticks) -> pd.DataFrame:
-        if symbol not in self.symbol_tracker_map:
-            self.symbol_tracker_map[symbol] = MockDataSource(symbol, timeframe)
+        if symbol not in self.symbol_candle_tracker_map:
+            self.symbol_candle_tracker_map[symbol] = MockDataSource(symbol, timeframe)
     
-        return self.symbol_tracker_map[symbol].get_next_candle_set(num_candlesticks)
-        
-    def get_ticks_for_symbol(self, symbol, num_ticks) -> pd.DataFrame:
-        if symbol not in self.symbol_tracker_map:
-            self.symbol_tracker_map[symbol] = MockDataSource(symbol, num_ticks)
-    
-        return self.symbol_tracker_map[symbol].get_next_tick_set()
+        return self.symbol_candle_tracker_map[symbol].get_next_candle_set(num_candlesticks)
     
     def get_symbol_info() -> str:
         return ""
     
-    def send_order():
+    def place_order(self, symbol, signal, volume, price, deviation) -> bool:
         # to-do
         # MockBank.send_order()
-        return 0
+        return True
     
-    def cancel_order():
-        #to-do
-        return 0
+    def get_account_balance(self) -> float:
+        return 10.0
+    
+    def get_ask_price(self, symbol) -> int:
+        return 10
+    
+    def get_bid_price(self, symbol) -> int:
+       return 10
+   
+    def get_positions(self) -> dict:
+        return {}
+    
+    

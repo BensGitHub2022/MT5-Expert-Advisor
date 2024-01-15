@@ -1,11 +1,10 @@
-from enum import Enum
 import MetaTrader5 as mt5
 import pandas as pd
-from src.CommonEnums.Timeframe import Timeframe
-from src.Connections.ConnectionInterface import ConnectionInterface
+from src.Enums.Timeframe import Timeframe
+from src.Connections.AbstractConnection import AbstractConnection
 from src.Connections.MT5.JsonReader import JsonReader
 
-class MetaTraderConnection(ConnectionInterface):
+class MetaTraderConnection(AbstractConnection):
     # Paths to MetaTrader5 login details.
     credentials = JsonReader("src/Connections/MT5/credentials.json").get_json_data()
     json_settings = JsonReader("pkg/settings.json").get_json_data()
@@ -15,7 +14,7 @@ class MetaTraderConnection(ConnectionInterface):
     
     """
     Attempts to initialize and log into MetaTrader5.
-    :returns bool: True if initialization and login succeeds. Otherwise, false.
+    :returns bool: True if initialization and login succeeds. Otherwise, False.
     """
     def connect(self) -> bool:
 
@@ -64,22 +63,60 @@ class MetaTraderConnection(ConnectionInterface):
         except Exception as e:
             print(e)
             raise
-        
-    def get_ticks_for_symbol(self, symbol, num_ticks) -> pd.DataFrame:
-        ticks = mt5.copy_ticks_from(symbol, self.current_time, num_ticks, mt5.COPY_TICKS_ALL)
-        return pd.DataFrame(ticks)
+    
+    def get_symbol_info_tick(self, symbol) -> dict:
+        return mt5.symbol_info_tick(symbol)._asdict()
+    
+    def get_ask_price(self, symbol) -> int:
+        return self.get_symbol_info_tick(symbol)['ask']
+    
+    def get_bid_price(self, symbol) -> int:
+       return self.get_symbol_info_tick(symbol)['bid']
     
     def get_symbol_info(self, symbol) -> str:
         return mt5.symbol_info(symbol)._asdict()
     
-    def send_order():
-        # to-do
-        return 0
+    def place_order(self, symbol, signal, volume, price, deviation) -> bool:
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": symbol,
+            "volume": round(float(volume),2),
+            "price": round(float(price),2),
+            "deviation": deviation,
+            "magic": 100,
+            "comment": "python script open",
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": mt5.ORDER_FILLING_IOC,
+        }
+        
+        if 1:
+            request["type"] = mt5.ORDER_TYPE_BUY
+            print("buying")
+        else:
+            request["type"] = mt5.ORDER_TYPE_SELL
+            print("selling")
+        
+        return mt5.order_send(request)
     
-    def cancel_order():
-        #to-do
-        return 0
+    def get_account_balance(self) -> float:
+        return mt5.account_info()._asdict()['balance']
     
-    def get_account_balance() -> int:
-        #to-do
-        return 0
+    def close_position(self, position, bid, ask, deviation) -> bool:
+        request = {
+            "action": TradeAction['market_order'].value,
+            "position": position.ticket,
+            "symbol": position.symbol,
+            "volume": round(float(position.volume),2),
+            "type": OrderType['buy'].value if position.type == 1 else OrderType['sell'].value,
+            "price": round(float(ask),2) if position.type == 1 else round(float(bid),2),
+            "deviation": deviation,
+            "magic": 100,
+            "comment": "python script close",
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": mt5.ORDER_FILLING_IOC,
+        }
+
+        return mt5.order_send(request)
+    
+    def get_positions(self) -> dict:
+        return mt5.positions_get()

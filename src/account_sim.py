@@ -1,27 +1,17 @@
 import pandas as pd
 
-from src.interfaces import IAccount
+from src.abstract_account import AbstractAccount
 
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
-class AccountSimulator(IAccount):
-    
-    balance: float
-    profit: float
-
-    ticket: int
-    symbol: object # should we pass a symbol object to this class ? 
-    
-    positions_df: pd.DataFrame
-    positions: dict
+class AccountSimulator(AbstractAccount):
 
     def __init__(self, balance, profit) -> None:
         self.balance = balance
         self.profit = profit
         self.ticket = 500000000
-        self.positions = dict()
         self.positions_df = pd.DataFrame('symbol','ticket','time','type','volume','price','current_price','profit') 
 
     def update_balance(self, profit) -> None:
@@ -85,6 +75,11 @@ class AccountSimulator(IAccount):
         if(type == 'sell'):
             current_price = self.symbol.get_symbol_info_ask()
         return current_price
+    
+    def get_account_profit(self) -> float:
+        account_info_dict = self.get_account_info()
+        profit = account_info_dict['profit']
+        return profit
     
     # Option 1, use the current time as the trade time when running trade executor in mock
     def get_date_time_now(self) -> datetime:

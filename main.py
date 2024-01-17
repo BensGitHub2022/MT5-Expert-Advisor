@@ -68,17 +68,16 @@ def main():
             strategy.process_next(symbol.get_candlesticks(NEXT))
             signal = strategy.check_signal()
             
-            match signal.get('action'):
-                case 1:
-                    if(account.get_positions()):
-                        trade_executor.close_all_positions(symbol.get_symbol_info_bid(), symbol.get_symbol_info_ask(),20)
-                    trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_ask(),20) 
-                case -1:
-                    if(account.get_positions()):
-                        trade_executor.close_all_positions(symbol.get_symbol_info_bid(), symbol.get_symbol_info_ask(),20)
-                    trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_bid(),20) 
-                case 0:
-                    trade_executor.do_nothing()
+            if signal.get('action') == 1:
+                if(account.get_positions()):
+                    trade_executor.close_all_positions(symbol.get_symbol_info_bid(), symbol.get_symbol_info_ask(),20)
+                trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_ask(),20) 
+            elif signal.get('action') == -1:
+                if(account.get_positions()):
+                    trade_executor.close_all_positions(symbol.get_symbol_info_bid(), symbol.get_symbol_info_ask(),20)
+                trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_bid(),20) 
+            else:
+                trade_executor.do_nothing()
              
             strategy.record_action()
             action_writer.print_action()

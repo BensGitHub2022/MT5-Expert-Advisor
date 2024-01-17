@@ -1,24 +1,13 @@
 import MetaTrader5 as mt5
 import pandas as pd
 
-from src.interfaces import IAccount
+from src.abstract_account import AbstractAccount
 
-class AccountMT5(IAccount):
-
-    balance: float
-    profit: float
-
-    ticket: int # do we use this ticket variable in live implementation ?
-    symbol: object # should we pass a symbol object to this class ? 
+class AccountMT5(AbstractAccount):
     
-    positions_df: pd.DataFrame
-    positions: dict
-
-    def __init__(self) -> None:
+    def __init__(self):
         self.balance = self.get_account_balance()
         self.profit = self.get_account_profit()
-        self.positions = dict()
-        # self.positions_df = pd.DataFrame() # Not used
         
     def get_account_info(self) -> dict:
         account_info_dict = mt5.account_info()._asdict()

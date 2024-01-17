@@ -3,30 +3,22 @@ import pandas as pd
 from enum import Enum
 import MetaTrader5 as mt5
 
-from src.interfaces import ISymbols
+from src.abstract_symbols import AbstractSymbols
 
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
-class SymbolsMT5(ISymbols):
+class SymbolsMT5(AbstractSymbols):
 
     candles: np.array
-    candles_df: pd.DataFrame
-
-    symbol: str 
-    mt5_timeframe: int
-    timeframe: str
-    start_pos: int
     
     # used only by ticks retrieval method, not the same as candlestick/system time inside EmaStrategy object
     current_time: timezone
 
     def __init__(self, symbol: str, timeframe: str) -> None:
-        self.symbol = symbol
-        self.timeframe = timeframe
+        super().__init__(symbol, timeframe)
         self.mt5_timeframe = self.get_mt5_timeframe(timeframe)
-        self.start_pos = 0
 
     def set_symbol(self, symbol: str, timeframe: str) -> None:
         self.symbol = symbol
@@ -59,25 +51,12 @@ class SymbolsMT5(ISymbols):
     def get_symbol_info_tick(self) -> dict:
         symbol_info_tick = mt5.symbol_info_tick(self.symbol)._asdict()
         return symbol_info_tick
-    
-    def get_symbol_info_bid(self) -> float:
-        symbol_info_tick = self.get_symbol_info_tick()
-        symbol_info_bid = symbol_info_tick['bid']
-        return symbol_info_bid
-
-    def get_symbol_info_ask(self) -> float:
-        symbol_info_tick = self.get_symbol_info_tick()
-        symbol_info_ask = symbol_info_tick['ask']
-        return symbol_info_ask
 
     def get_ticks(self, num_ticks, current_time = 0) -> pd.DataFrame:
         self.current_time = current_time
         ticks = mt5.copy_ticks_from(self.symbol, self.current_time, num_ticks, mt5.COPY_TICKS_ALL)
         ticks_df = pd.DataFrame(ticks)
         return ticks_df
-    
-    def get_symbol_name(self) -> str:
-        return self.symbol
 
     def get_mt5_timeframe(self, timeframe: str):
         """

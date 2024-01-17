@@ -1,28 +1,7 @@
-import pandas as pd
 import MetaTrader5 as mt5
 from enum import Enum
 
-RISK = .02
-
 class TradeExecutorMT5():
-
-    current_risk_per_trade: float 
-    current_lot_size: float
-    account_info: object
-
-    def __init__(self, account: object) -> None:
-        self.current_risk_per_trade = 0.0
-        self.current_lot_size = 0.0
-        self.account_info = account
-
-    def calc_risk_per_trade(self) -> float:
-        self.current_risk_per_trade = self.account_info.get_account_balance() * RISK
-        return self.current_risk_per_trade
-    
-    def calc_lot_size(self, price) -> float:
-        self.current_risk_per_trade = self.calc_risk_per_trade()
-        self.current_lot_size = self.current_risk_per_trade / price
-        return self.current_lot_size
 
     def place_order(self, symbol, signal, price, deviation) -> bool:
 
@@ -105,15 +84,6 @@ class TradeExecutorMT5():
 
         print("2. order_send done, ", result) 
         print("closed POSITION_TICKET={}, profit {}".format(position.ticket, position.profit))
-    
-    def close_all_positions(self, bid, ask, deviation) -> bool:
-        positions = self.account_info.get_positions()
-        for position in positions:
-            self.close_position(position, bid, ask, deviation)
-    
-    def do_nothing(self) -> None:
-        print("No actionable trades!")
-        return
     
 class OrderType(Enum):
     buy = mt5.ORDER_TYPE_BUY

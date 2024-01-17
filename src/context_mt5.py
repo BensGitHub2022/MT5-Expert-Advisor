@@ -1,21 +1,9 @@
 import MetaTrader5 as mt5
 import pandas as pd
 
-from src.interfaces import IContext
+from src.abstract_context import AbstractContext
 
-class ContextMT5(IContext): 
-
-    json_settings: dict
-    credentials: dict
-
-    def __init__(self, json_settings: dict, credentials: dict):
-        """
-        Initializes MetaTrader object
-        :param json_settings: A dict containing symbol trading details.
-        :param credentials: A dict containing MetaTrader5 login details.
-        """
-        self.json_settings = json_settings
-        self.credentials = credentials
+class ContextMT5(AbstractContext): 
 
     def connect(self) -> bool:
         """

@@ -1,19 +1,7 @@
 
-from src.interfaces import IContext
+from src.abstract_context import AbstractContext
 
-class ContextSimulator(IContext):
-
-    json_settings: dict
-    credentials: dict    
-
-    def __init__(self, json_settings: dict, credentials: dict):
-        """
-        Initializes MetaTrader object
-        :param json_settings: A dict containing symbol trading details.
-        :param credentials: A dict containing MetaTrader5 login details.
-        """
-        self.json_settings = json_settings
-        self.credentials = credentials
+class ContextSimulator(AbstractContext):
 
     def connect(self) -> bool:
         # always happy

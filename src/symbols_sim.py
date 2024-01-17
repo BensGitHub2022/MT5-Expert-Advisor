@@ -2,36 +2,20 @@ import numpy as np
 import pandas as pd
 from enum import Enum
 
-from src.interfaces import ISymbols
-
-from datetime import datetime
-from datetime import timedelta
+from src.abstract_symbols import AbstractSymbols
 from datetime import timezone
 
+class SymbolsSimulator(AbstractSymbols):
 
-class SymbolsSimulator(ISymbols):
-
-    ### Unique to Mock class ###
     candles_df_master: pd.DataFrame
     ticks_df_master: pd.DataFrame
     counter: object
     mock_location: str
-    ### #################### ###
-
-    candles_df: pd.DataFrame
-
-    symbol: str 
-    mt5_timeframe: int # do we use this in mock ?
-    timeframe: str # do we use this in mock ?
-    start_pos: int # how do we use start pos in mock?
-
     current_time: timezone # do we use this in mock ?
 
     def __init__(self, symbol, timeframe, candles_mock_location="mock/candlesticks.csv", ticks_mock_location="mock/ticks.csv"):
-        self.symbol = symbol
-        self.timeframe = timeframe
+        super().__init__(symbol, timeframe)
         self.mt5_timeframe = self.get_mt5_timeframe(timeframe) # do we need this?
-        self.start_pos = 0 # how do we use start pos in mock? # counter unique to mock 
         
         self.ticks_df_master = self.get_ticks_from_csv(ticks_mock_location)
         self.candles_df_master = self.get_candlesticks_from_csv(candles_mock_location)
@@ -65,21 +49,8 @@ class SymbolsSimulator(ISymbols):
         tick = tick_df.to_dict('list')
         return tick
 
-    def get_symbol_info_bid(self) -> float:
-        symbol_info_tick = self.get_symbol_info_tick()
-        symbol_info_bid = symbol_info_tick['bid'][0]
-        return symbol_info_bid
-
-    def get_symbol_info_ask(self) -> float:
-        symbol_info_tick = self.get_symbol_info_tick()
-        symbol_info_ask = symbol_info_tick['ask']
-        return symbol_info_ask
-
     def get_ticks(self, num_ticks, current_time = 0) -> pd.DataFrame:
         pass
-
-    def get_symbol_name(self) -> str:
-        return self.symbol
 
     ### Implementation unique to mock method ###
     # Get candlesticks master file

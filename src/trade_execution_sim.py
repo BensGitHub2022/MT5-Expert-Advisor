@@ -1,6 +1,8 @@
 import pandas as pd
 
-class TradeExecutorSimulator():
+from src.abstract_trade_execution import AbstractTradeExecution
+
+class TradeExecutorSimulator(AbstractTradeExecution):
 
     current_profit: float # have we defined yet?
     

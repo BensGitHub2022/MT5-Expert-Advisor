@@ -8,9 +8,9 @@ from datetime import timezone
 
 class AccountSimulator(AbstractAccount):
 
-    def __init__(self, balance, profit) -> None:
-        self.balance = balance
-        self.profit = profit
+    def __init__(self):
+        self.balance = 100
+        self.profit = 100
         self.ticket = 500000000
         self.positions_df = pd.DataFrame('symbol','ticket','time','type','volume','price','current_price','profit') 
 

@@ -1,7 +1,9 @@
 import MetaTrader5 as mt5
 from enum import Enum
 
-class TradeExecutorMT5():
+from src.abstract_trade_execution import AbstractTradeExecution
+
+class TradeExecutorMT5(AbstractTradeExecution):
 
     def place_order(self, symbol, signal, price, deviation) -> bool:
 

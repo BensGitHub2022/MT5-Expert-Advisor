@@ -14,7 +14,7 @@ class AbstractTradeExecution(abc.ABC):
         self.current_risk_per_trade = self.account_info.get_account_balance() * self.RISK
         return self.current_risk_per_trade
 
-    def calc_lot_size(self, price) -> float:
+    def calc_lot_size(self, price: float) -> float:
         self.current_risk_per_trade = self.calc_risk_per_trade()
         self.current_lot_size = self.current_risk_per_trade / price
         return self.current_lot_size
@@ -34,8 +34,4 @@ class AbstractTradeExecution(abc.ABC):
 
     @abc.abstractmethod
     def close_position(self) -> bool:
-        pass
-
-    @abc.abstractmethod
-    def calc_lot_size(self) -> float:
         pass

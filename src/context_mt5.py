@@ -1,9 +1,9 @@
 import MetaTrader5 as mt5
 import pandas as pd
 
-from src.interfaces import IMetaTrader
+from src.interfaces import IContext
 
-class MetaTraderAdapter(IMetaTrader): 
+class ContextMT5(IContext): 
 
     json_settings: dict
     credentials: dict

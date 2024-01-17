@@ -1,7 +1,7 @@
 
-from src.interfaces import IMetaTrader
+from src.interfaces import IContext
 
-class MetaTraderMock(IMetaTrader):
+class ContextSimulator(IContext):
 
     json_settings: dict
     credentials: dict    

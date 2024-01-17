@@ -1,7 +1,7 @@
 
 from src.interfaces import ISymbols
-from src.symbols_adapter import SymbolsAdapter
-from src.symbols_mock import SymbolsMock
+from src.symbols_mt5 import SymbolsMT5
+from src.symbols_sim import SymbolsSimulator
 
 class SymbolsFactory():
 
@@ -12,6 +12,6 @@ class SymbolsFactory():
 
     def create_symbol(self, symbol, timeframe, candles_mock_location = "mock/candlesticks.csv", ticks_mock_location="mock/ticks.csv") -> ISymbols:
         if (self.production):
-            return SymbolsAdapter(symbol, timeframe)
+            return SymbolsMT5(symbol, timeframe)
         else:
-            return SymbolsMock(symbol, timeframe, candles_mock_location, ticks_mock_location)
+            return SymbolsSimulator(symbol, timeframe, candles_mock_location, ticks_mock_location)

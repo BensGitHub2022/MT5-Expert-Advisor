@@ -12,7 +12,7 @@
 ## Dependencies
 
 ### Install Python
-BBSTrader requires [Python](https://www.python.org/downloads/) version 3.6-3.10. Note: Python version 3.11 & 3.12 are not supported by MT5!
+BBSTrader requires [Python](https://www.python.org/downloads/) version 3.10.
 
 ### Install MetaTrader 5
 Currently, MetaTrader 5 supports the following platforms:

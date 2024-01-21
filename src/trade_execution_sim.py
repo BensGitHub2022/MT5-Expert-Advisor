@@ -41,13 +41,16 @@ class TradeExecutorSimulator():
     def close_position(self, position, bid, ask, deviation) -> bool:
         ticket = position.ticket
         self.account_info.update_position(ticket)
-        profit = self.account_info.get_profit(ticket)
-        self.account_info.remove_position(ticket)
-        self.account_info.update_balance(profit)
-        self.account_info.update_profit(profit)
+        balance_update = self.account_info.remove_position(ticket)
+        self.account_info.update_balance(balance_update.capital)
+        self.account_info.update_profit(balance_update.profit)
         return True
     
     def close_all_positions(self, bid, ask, deviation) -> bool:
         positions = self.account_info.get_positions()
         for position in positions:
             self.close_position(position, bid, ask, deviation)
+
+    def do_nothing(self) -> None:
+        print("No actionable trades!")
+        return

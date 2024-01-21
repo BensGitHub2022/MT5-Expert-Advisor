@@ -25,7 +25,7 @@ class ActionWriter():
         
     def write_action(self) -> None:
         """
-        This method writes the results of trades to a csv file called action_history.csv or anothe file of the user's choosing
+        This method writes the results of trades to a csv file called action_history.csv or another file of the user's choosing
         :return: none
         """
         if(not self.initialized):

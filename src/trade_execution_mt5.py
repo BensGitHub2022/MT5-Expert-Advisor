@@ -2,7 +2,7 @@ import pandas as pd
 import MetaTrader5 as mt5
 from enum import Enum
 
-from src.shared_helper_functions import calc_risk_per_trade
+from src.shared_helper_functions import calc_lot_size
 
 #RISK = .02
 
@@ -20,15 +20,16 @@ class TradeExecutorMT5():
     def calc_risk_per_trade(self) -> float:
         self.current_risk_per_trade = self.account_info.get_account_balance() * RISK
         return self.current_risk_per_trade
-    """
+    
     def calc_lot_size(self, price) -> float:
         self.current_risk_per_trade = calc_risk_per_trade(self.account_info.get_account_balance())
         self.current_lot_size = self.current_risk_per_trade / price
         return self.current_lot_size
-
+    """
+    
     def place_order(self, symbol, signal, price, deviation) -> bool:
 
-        volume = self.calc_lot_size(price)
+        volume = calc_lot_size(price, self.account_info.get_account_balance())
 
         request = {
             "action": TradeAction['market_order'].value,

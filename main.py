@@ -21,7 +21,7 @@ EMA_LONG = 8
 INTERVAL = EMA_LONG+1
 NEXT = 1
 
-PRODUCTION = True # added for convenience, all factories eventually created in main and passed to trade_bot
+PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
     print("Hello Trade Bot!")

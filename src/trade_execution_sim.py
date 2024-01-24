@@ -1,6 +1,6 @@
 import pandas as pd
 
-
+from src.shared_helper_functions import calc_lot_size
 
 RISK = .02
 
@@ -20,7 +20,8 @@ class TradeExecutorSimulator():
         self.current_risk_per_trade = 0.0
         self.current_lot_size = 0.0
         self.account_info = account
-
+    
+    """
     def calc_risk_per_trade(self) -> float:
         self.current_risk_per_trade = self.account_info.get_account_balance() * RISK
         return self.current_risk_per_trade
@@ -29,9 +30,11 @@ class TradeExecutorSimulator():
         self.current_risk_per_trade = self.calc_risk_per_trade()
         self.current_lot_size = self.current_risk_per_trade / price
         return self.current_lot_size
+    """
 
     def place_order(self, symbol, signal, price, deviation) -> bool:
-        volume = self.calc_lot_size(price)
+        balance = self.account_info.get_account_balance()
+        volume = calc_lot_size(price, balance)
         type = signal['action_str']
         capital_committed = (-1)*(volume * price)
         self.account_info.add_position(symbol,type,volume,price)
@@ -41,13 +44,16 @@ class TradeExecutorSimulator():
     def close_position(self, position, bid, ask, deviation) -> bool:
         ticket = position.ticket
         self.account_info.update_position(ticket)
-        profit = self.account_info.get_profit(ticket)
-        self.account_info.remove_position(ticket)
-        self.account_info.update_balance(profit)
-        self.account_info.update_profit(profit)
+        balance_update = self.account_info.remove_position(ticket)
+        self.account_info.update_balance(balance_update.capital)
+        self.account_info.update_profit(balance_update.profit)
         return True
     
     def close_all_positions(self, bid, ask, deviation) -> bool:
         positions = self.account_info.get_positions()
         for position in positions:
             self.close_position(position, bid, ask, deviation)
+
+    def do_nothing(self) -> None:
+        print("No actionable trades!")
+        return

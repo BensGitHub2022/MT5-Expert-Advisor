@@ -21,6 +21,8 @@ EMA_LONG = 8
 INTERVAL = EMA_LONG+1
 NEXT = 1
 
+PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
+
 def main():
     print("Hello Trade Bot!")
 
@@ -33,23 +35,23 @@ def main():
 
     credentials = JsonReader(CREDENTIALS_FILE_PATH)
 
-    meta_trader_factory = ContextFactory(production=True)
+    meta_trader_factory = ContextFactory(production=PRODUCTION)
     meta_trader = meta_trader_factory.create_context(json_settings.get_json_data(),credentials.get_json_data())
     meta_trader.connect()
 
     strategy = EmaStrategy(symbol,timeframe,EMA_SHORT,EMA_LONG)
     action_writer = strategy.get_action_writer()
     
-    symbol_factory = SymbolsFactory(production=True)
-    symbol = symbol_factory.create_symbol(symbol,timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION) # Mock
+    symbol_factory = SymbolsFactory(production=PRODUCTION)
+    symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION) # Mock
     # symbol = symbol_factory.create_symbol(symbol,timeframe) # Production
     print("Using the " + strategy.get_strategy_name() + ", trading on " + symbol.get_symbol_name())
     # print(symbol.get_symbol_info()) # Need to implement in mock!
 
-    account_factory = AccountFactory(production=True)
-    account = account_factory.create_account()
+    account_factory = AccountFactory(production=PRODUCTION)
+    account = account_factory.create_account(symbol, balance = 100000, profit = 0)
 
-    trade_execution_factory = TradeExecutionFactory(production=True)
+    trade_execution_factory = TradeExecutionFactory(production=PRODUCTION)
     trade_executor = trade_execution_factory.create_trade_executor(account)
     
     positions = account.get_positions()
@@ -79,9 +81,11 @@ def main():
                     trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_bid(),20) 
                 case 0:
                     trade_executor.do_nothing()
-             
+            
             strategy.record_action()
             action_writer.print_action()
+        
+        print(account.get_account_balance()) # 1.21.24 - Need to add this to the action_writer class
     
 
     """

@@ -3,18 +3,18 @@ import pandas as pd
 from enum import Enum
 import MetaTrader5 as mt5
 
-from src.interfaces import ISymbols
+from src.interfaces import ISymbol
 
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
-class SymbolsMT5(ISymbols):
+class SymbolMT5(ISymbol):
 
     candles: np.array
     candles_df: pd.DataFrame
 
-    symbol: str 
+    symbol_name: str 
     mt5_timeframe: int
     timeframe: str
     start_pos: int
@@ -22,18 +22,18 @@ class SymbolsMT5(ISymbols):
     # used only by ticks retrieval method, not the same as candlestick/system time inside EmaStrategy object
     current_time: timezone
 
-    def __init__(self, symbol: str, timeframe: str) -> None:
-        self.symbol = symbol
+    def __init__(self, symbol_name: str, timeframe: str) -> None:
+        self.symbol_name = symbol_name
         self.timeframe = timeframe
         self.mt5_timeframe = self.get_mt5_timeframe(timeframe)
         self.start_pos = 0
 
-    def set_symbol(self, symbol: str, timeframe: str) -> None:
-        self.symbol = symbol
+    def set_symbol(self, symbol_name: str, timeframe: str) -> None:
+        self.symbol_name = symbol_name
         self.timeframe = timeframe
 
     def get_candlesticks(self, num_candlesticks) -> pd.DataFrame:
-        self.candles = mt5.copy_rates_from_pos(self.symbol, self.mt5_timeframe, self.start_pos, num_candlesticks)
+        self.candles = mt5.copy_rates_from_pos(self.symbol_name, self.mt5_timeframe, self.start_pos, num_candlesticks)
         self.candles_df = pd.DataFrame(self.candles)
         return self.candles_df
     
@@ -43,8 +43,10 @@ class SymbolsMT5(ISymbols):
         return rounded_candlestick_time
     
     def get_symbol_info(self) -> bool:
-        symbol_info = mt5.symbol_info(self.symbol)._asdict()
-        return symbol_info
+        symbol_info = mt5.symbol_info(self.symbol_name)
+        if symbol_info == None:
+            raise RuntimeError('No symbol info returned from MT5. Error is ' + str(mt5.last_error() or ''))
+        return symbol_info._asdict()
     
     def get_symbol_pip_size(self) -> float:
         symbol_info = self.get_symbol_info()
@@ -57,8 +59,11 @@ class SymbolsMT5(ISymbols):
         return trade_contract_size
     
     def get_symbol_info_tick(self) -> dict:
-        symbol_info_tick = mt5.symbol_info_tick(self.symbol)._asdict()
-        return symbol_info_tick
+        symbol_info_tick = mt5.symbol_info_tick(self.symbol_name)
+        if symbol_info_tick == None:
+            error = mt5.last_error()
+            raise RuntimeError('No symbol info tick returned from MT5. Error is ' + str(mt5.last_error() or ''))
+        return symbol_info_tick._asdict()
     
     def get_symbol_info_bid(self) -> float:
         symbol_info_tick = self.get_symbol_info_tick()
@@ -72,12 +77,12 @@ class SymbolsMT5(ISymbols):
 
     def get_ticks(self, num_ticks, current_time = 0) -> pd.DataFrame:
         self.current_time = current_time
-        ticks = mt5.copy_ticks_from(self.symbol, self.current_time, num_ticks, mt5.COPY_TICKS_ALL)
+        ticks = mt5.copy_ticks_from(self.symbol_name, self.current_time, num_ticks, mt5.COPY_TICKS_ALL)
         ticks_df = pd.DataFrame(ticks)
         return ticks_df
     
     def get_symbol_name(self) -> str:
-        return self.symbol
+        return self.symbol_name
 
     def get_mt5_timeframe(self, timeframe: str):
         """

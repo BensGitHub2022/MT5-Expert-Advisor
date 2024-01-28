@@ -20,8 +20,8 @@ class ActionWriter():
         self.action_history_filepath = "log/action_history_" + self.get_date_time_now() + ".csv"
         self.initialized = False
         self.index = 0
-        with open(file=self.action_history_filepath, mode = 'a+') as csv_file:
-            return
+        # with open(file=self.action_history_filepath, mode = 'a+') as csv_file:
+        #     return
         
     def write_action(self) -> None:
         """

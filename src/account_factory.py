@@ -9,8 +9,8 @@ class AccountFactory():
     def __init__(self, production: bool):
         self.production = production
 
-    def create_account(self, symbol, balance=100000, profit=0):
+    def create_account(self, symbol, balance=100000, profit=0, action_writer = object):
         if (self.production):
             return AccountMT5(symbol)
         else:
-            return AccountSimulator(symbol, balance, profit)
+            return AccountSimulator(symbol, balance, profit, action_writer)

@@ -6,3 +6,4 @@ __pycache__
 credentials.json
 
 action_history*.csv
+position_history*.csv

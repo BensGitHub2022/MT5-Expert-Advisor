@@ -1,5 +1,6 @@
 from src.json_reader import JsonReader
 from src.trade_bot import TradeBot
+from src.action_writer import ActionWriter
 from src.ema_strategy import EmaStrategy
 from src.symbols_factory import SymbolsFactory
 from src.context_factory import ContextFactory
@@ -39,8 +40,8 @@ def main():
     meta_trader = meta_trader_factory.create_context(json_settings.get_json_data(),credentials.get_json_data())
     meta_trader.connect()
 
-    strategy = EmaStrategy(symbol,timeframe,EMA_SHORT,EMA_LONG)
-    action_writer = strategy.get_action_writer()
+    action_writer = ActionWriter()
+    strategy = EmaStrategy(symbol,timeframe,EMA_SHORT,EMA_LONG, action_writer)
     
     symbol_factory = SymbolsFactory(production=PRODUCTION)
     symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION) # Mock
@@ -49,7 +50,7 @@ def main():
     # print(symbol.get_symbol_info()) # Need to implement in mock!
 
     account_factory = AccountFactory(production=PRODUCTION)
-    account = account_factory.create_account(symbol, balance = 100000, profit = 0)
+    account = account_factory.create_account(symbol, balance = 99747.35, profit = 0, action_writer=action_writer)
 
     trade_execution_factory = TradeExecutionFactory(production=PRODUCTION)
     trade_executor = trade_execution_factory.create_trade_executor(account)

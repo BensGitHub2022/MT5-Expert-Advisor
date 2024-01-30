@@ -1,12 +1,9 @@
 from collections import namedtuple
-from mock import MagicMock, patch
+from mock import patch
 from src.symbol_mt5 import SymbolMT5
 
 import pytest
-import sys
 import unittest
-
-sys.modules['mt5'] = MagicMock()
 
 class SymbolMT5Tests(unittest.TestCase):
     

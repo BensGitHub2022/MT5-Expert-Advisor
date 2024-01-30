@@ -11,6 +11,6 @@ class AccountFactory():
 
     def create_account(self, symbol, balance=100000, profit=0):
         if (self.production):
-            return AccountMT5(symbol)
+            return AccountMT5()
         else:
             return AccountSimulator(symbol, balance, profit)

@@ -23,7 +23,7 @@ class AccountMT5(IAccount):
     def get_positions(self) -> tuple: # Note on 1.21.24 that MT5 returns positions as a named Tuple
         self.positions = mt5.positions_get()
         return self.positions
-    
+
     # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame # 1.21.24 - positions are actually Tuples
     """
     def get_positions_df(self) -> pd.DataFrame:

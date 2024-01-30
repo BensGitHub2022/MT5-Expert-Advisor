@@ -1,4 +1,3 @@
-import pandas as pd
 import MetaTrader5 as mt5
 from enum import Enum
 
@@ -34,9 +33,9 @@ class TradeExecutorMT5():
         request = {
             "action": TradeAction['market_order'].value,
             "symbol": symbol,
-            "volume": round(float(volume),2),
+            "volume": round(float(volume), 2),
             "type": OrderType[signal['action_str']].value,
-            "price": round(float(price),2),
+            "price": round(float(price), 2),
             "deviation": deviation,
             "magic": 100,
             "comment": "python script open",
@@ -45,6 +44,9 @@ class TradeExecutorMT5():
         }
         
         result = mt5.order_send(request)
+        if result == None:
+            raise RuntimeError('Error sending order: ' + str(mt5.last_error() or ''))
+        print("result of order: ")
         print(result)
         print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal['action_str'], symbol,volume,price,deviation))
         

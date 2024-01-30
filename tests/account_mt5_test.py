@@ -1,12 +1,9 @@
 from collections import namedtuple
-from mock import MagicMock, patch
+from mock import patch
 from src.account_mt5 import AccountMT5
 
 import pytest
-import sys
 import unittest
-
-sys.modules['mt5'] = MagicMock()
 
 class AccountMT5Tests(unittest.TestCase):
     
@@ -18,8 +15,8 @@ class AccountMT5Tests(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        AccountMock = namedtuple("Account", ["balance", "profit"])
-        self.account_info_response = AccountMock(self.balance, self.profit)
+        AccountResponse = namedtuple("AccountResponse", ["balance", "profit"])
+        self.account_info_response = AccountResponse(self.balance, self.profit)
         self.account = AccountMT5()
 
     @patch('src.account_mt5.mt5.account_info')

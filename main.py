@@ -20,7 +20,7 @@ EMA_LONG = 8
 INTERVAL = EMA_LONG+1
 NEXT = 1
 
-PRODUCTION = True # added for convenience, all factories eventually created in main and passed to trade_bot
+PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
     print("Hello Trade Bot!")
@@ -39,7 +39,7 @@ def main():
     meta_trader.connect()
 
     strategy = EmaStrategy(symbol,timeframe,EMA_SHORT,EMA_LONG)
-    # action_writer = strategy.get_action_writer()
+    action_writer = strategy.get_action_writer()
     
     symbol_factory = SymbolFactory(production=PRODUCTION)
     symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION) # Mock
@@ -61,8 +61,8 @@ def main():
     
     print(symbol.get_symbol_info_bid())
 
-    # strategy.record_action()
-    # action_writer.print_action()
+    strategy.record_action()
+    action_writer.print_action()
     
     while (True):
         if(strategy.check_next(symbol.get_candlestick_time())):
@@ -81,8 +81,8 @@ def main():
                 case 0:
                     trade_executor.do_nothing()
             
-            # strategy.record_action()
-            # action_writer.print_action()
+            strategy.record_action()
+            action_writer.print_action()
         
         print(account.get_account_balance()) # 1.21.24 - Need to add this to the action_writer class
     

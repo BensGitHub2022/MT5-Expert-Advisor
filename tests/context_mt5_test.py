@@ -1,12 +1,9 @@
 import unittest
-from mock import MagicMock, patch
+from mock import patch
 from src.context_mt5 import ContextMT5
 
 import json
 import pytest
-import sys
-
-sys.modules['mt5'] = MagicMock()
 
 class ContextMT5Tests(unittest.TestCase):
     

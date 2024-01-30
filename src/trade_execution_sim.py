@@ -21,17 +21,6 @@ class TradeExecutorSimulator():
         self.current_lot_size = 0.0
         self.account_info = account
     
-    """
-    def calc_risk_per_trade(self) -> float:
-        self.current_risk_per_trade = self.account_info.get_account_balance() * RISK
-        return self.current_risk_per_trade
-
-    def calc_lot_size(self, price) -> float:
-        self.current_risk_per_trade = self.calc_risk_per_trade()
-        self.current_lot_size = self.current_risk_per_trade / price
-        return self.current_lot_size
-    """
-
     def place_order(self, symbol, signal, price, deviation) -> bool:
         balance = self.account_info.get_account_balance()
         volume = calc_lot_size(price, balance)

@@ -13,18 +13,21 @@ class AccountSimulator(IAccount):
     profit: float
 
     ticket: int
-    symbol: object # should we pass a symbol object to this class ? 
+    symbol: object 
     
     positions_df: pd.DataFrame
     positions: dict
 
-    def __init__(self, symbol, balance, profit) -> None:
+    action_writer: object
+
+    def __init__(self, symbol: object, balance: float, profit: float, action_writer: object) -> None:
         self.balance = balance
         self.profit = profit
         self.ticket = 500000000
         self.positions = dict()
         self.positions_df = pd.DataFrame(columns=['symbol','ticket','time','type','volume','price','current_price','profit'])
         self.symbol = symbol
+        self.action_writer = action_writer
 
     def update_balance(self, capital_committed) -> None:
         self.balance += capital_committed
@@ -36,12 +39,14 @@ class AccountSimulator(IAccount):
         return self.balance
         
     def add_position(self, symbol, type, volume, price) -> bool:
-        time = self.get_date_time_now() # change this to match candlestick time ?
-        current_price = price # self.get_current_price(type)
+        #time = self.get_date_time_now() # change this to match candlestick time ? 1.27.24 - updated
+        time = self.symbol.get_tick_time()
+        current_price = price 
         d = {'symbol': symbol,'ticket':self.ticket,'time':time,'type':type,'volume':volume,'price':price,'current_price':current_price,'profit':self.calc_profit(type, price, current_price)}
         new_position_df = pd.DataFrame(data=[d])
+        self.record_position(new_position_df)
         self.positions_df = pd.concat([self.positions_df, new_position_df], ignore_index=True)
-        self.ticket =+ 1
+        self.ticket += 1
         return True
 
     def remove_position(self, ticket) -> tuple:
@@ -101,8 +106,7 @@ class AccountSimulator(IAccount):
     def get_position(self, ticket) -> pd.DataFrame:
         # Return one position out of the positions_df
         pass
-    
-        
+      
     def get_current_price(self, type) -> float:
         current_price = 0
         if(type == 'buy'):
@@ -131,3 +135,8 @@ class AccountSimulator(IAccount):
     def set_symbol(self, symbol: object) -> object:
         self.symbol = symbol
         return self.symbol
+
+    def record_position(self, position_df) -> bool:
+        self.action_writer.record_position(position_df)
+        self.action_writer.write_position()
+        return True

@@ -37,20 +37,18 @@ class ContextMT5Tests(unittest.TestCase):
         mock_login.return_value = True
         assert self.context_with_complete_creds.connect()
 
-    @patch('src.context_mt5.mt5.login')
     @patch('src.context_mt5.mt5.initialize')
-    def test_connect_init_unsucessful(self, mock_init, mock_login):
+    def test_connect_initialization_errors(self, mock_init):
+        mock_init.return_value = False
         with pytest.raises(ConnectionError):
-            mock_init.return_value = False
-            mock_login.return_value = True
             self.context_with_complete_creds.connect()
-
+  
     @patch('src.context_mt5.mt5.login')
     @patch('src.context_mt5.mt5.initialize')
     def test_connect_login_errors(self, mock_init, mock_login):
         mock_init.return_value = True
-        mock_login.side_effect = ConnectionError
-        with pytest.raises(ConnectionError):
+        mock_login.return_value = False
+        with pytest.raises(PermissionError):
             self.context_with_complete_creds.connect()
 
     def test_connect_setting_value_missing(self):

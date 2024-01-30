@@ -37,3 +37,11 @@ class AccountMT5Tests(unittest.TestCase):
         last_error_query.return_value = None
         with pytest.raises(RuntimeError):
             self.account.get_account_info()
+            
+    @patch('src.account_mt5.mt5.last_error')
+    @patch('src.account_mt5.mt5.positions_get')
+    def test_get_positions_none_response(self, positions_query, last_error_query):
+        positions_query.return_value = None
+        last_error_query.return_value = None
+        with pytest.raises(RuntimeError):
+            self.account.get_positions()

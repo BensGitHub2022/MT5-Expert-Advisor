@@ -21,8 +21,10 @@ class AccountMT5(IAccount):
         return profit
     
     def get_positions(self) -> tuple: # Note on 1.21.24 that MT5 returns positions as a named Tuple
-        self.positions = mt5.positions_get()
-        return self.positions
+        positions = mt5.positions_get()
+        if positions == None:
+            raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
+        return positions
 
     # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame # 1.21.24 - positions are actually Tuples
     """

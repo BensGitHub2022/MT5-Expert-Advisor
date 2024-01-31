@@ -1,6 +1,7 @@
 import pandas as pd
 
 from src.shared_helper_functions import calc_lot_size
+from src.signal import Signal
 
 RISK = .02
 
@@ -21,10 +22,10 @@ class TradeExecutorSimulator():
         self.current_lot_size = 0.0
         self.account_info = account
     
-    def place_order(self, symbol, signal, price, deviation) -> bool:
+    def place_order(self, symbol, signal: Signal, price, deviation) -> bool:
         balance = self.account_info.get_account_balance()
         volume = calc_lot_size(price, balance)
-        type = signal['action_str']
+        type = signal.signal_type.value
         capital_committed = (-1)*(volume * price)
         self.account_info.add_position(symbol,type,volume,price)
         self.account_info.update_balance(capital_committed)

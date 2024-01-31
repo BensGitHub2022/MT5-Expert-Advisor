@@ -8,6 +8,8 @@ from datetime import timezone
 
 from src.interfaces import IStrategy
 from src.action_writer import ActionWriter
+from src.signal import Signal
+from src.signal_type import SignalType
 
 SMOOTHENING = 2
 
@@ -66,7 +68,6 @@ class EmaStrategy(IStrategy):
         self.action_df = pd.DataFrame(columns = ['EMA_short', 'EMA_long','action','action_str'])
         self.action = 0
         self.action_str = ''
-        self.signal = {'action': self.action, 'action_str': self.action_str}
 
         self.action_writer = action_writer
         self.initialized = False
@@ -128,32 +129,21 @@ class EmaStrategy(IStrategy):
         self.action_df = pd.concat([self.action_df,new_df], ignore_index=True)
         return True
 
-    def check_signal(self) -> dict:        
+    def check_signal(self) -> Signal:        
         ema_short = self.action_df['EMA_short']
         ema_long = self.action_df['EMA_long']
 
-        self.action_str = "No signal"
-        self.action = 0
-
         #buy if short ema crosses above long ema
         if (ema_short.iloc[-2] < ema_long.iloc[-2]) and (ema_short.iloc[-1] > ema_long.iloc[-1]):
-            self.action_str = "buy"
-            self.action = 1
-            self.signal = {'action': self.action, 'action_str': self.action_str}
             winsound.Beep(self.frequency, self.duration)
+            return Signal(SignalType.BUY)
 
         #sell if short ema crosses below long ema
         if (ema_short.iloc[-2] > ema_long.iloc[-2]) and (ema_short.iloc[-1] < ema_long.iloc[-1]):
-            self.action_str = "sell"
-            self.action = -1
-            self.signal = {'action': self.action, 'action_str': self.action_str}
             winsound.Beep(self.frequency, self.duration)
-        
-        self.action_df.loc[self.ema_long,'action'] = self.action
-        self.action_df.loc[self.ema_long,'action_str'] = self.action_str
-        self.signal = {'action': self.action, 'action_str': self.action_str}
+            return Signal(SignalType.SELL)
 
-        return self.signal # Use tuple instead of dict here? Seems more appropriate
+        return Signal(SignalType.SKIP) # Use tuple instead of dict here? Seems more appropriate
     
     def record_action(self) -> bool:
         if(not self.initialized):
@@ -192,9 +182,6 @@ class EmaStrategy(IStrategy):
     
     def get_action_writer(self) -> object:
         return self.action_writer
-
-    def get_signal(self) -> dict:
-        return self.signal
 
     def set_current_system_time(self) -> None:
         self.current_system_time = self.get_system_time()

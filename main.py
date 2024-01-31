@@ -1,10 +1,11 @@
-from src.json_reader import JsonReader
-from src.trade_bot import TradeBot
-from src.action_writer import ActionWriter
-from src.ema_strategy import EmaStrategy
-from src.symbols_factory import SymbolsFactory
-from src.context_factory import ContextFactory
 from src.account_factory import AccountFactory
+from src.action_writer import ActionWriter
+from src.context_factory import ContextFactory
+from src.ema_strategy import EmaStrategy
+from src.json_reader import JsonReader
+from src.signal import Signal
+from src.signal_type import SignalType
+from src.symbols_factory import SymbolsFactory
 from src.trade_execution_factory import TradeExecutionFactory
 
 import pandas as pd
@@ -69,18 +70,18 @@ def main():
     while (True):
         if(strategy.check_next(symbol.get_candlestick_time())):
             strategy.process_next(symbol.get_candlesticks(NEXT))
-            signal = strategy.check_signal()
+            signal: Signal = strategy.check_signal()
             
-            match signal.get('action'):
-                case 1:
+            match signal.signal_type:
+                case SignalType.BUY:
                     if(account.get_positions()):
                         trade_executor.close_all_positions(symbol.get_symbol_info_bid(), symbol.get_symbol_info_ask(),20)
                     trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_ask(),20) 
-                case -1:
+                case SignalType.SELL:
                     if(account.get_positions()):
                         trade_executor.close_all_positions(symbol.get_symbol_info_bid(), symbol.get_symbol_info_ask(),20)
                     trade_executor.place_order(symbol.get_symbol_name(),signal,symbol.get_symbol_info_bid(),20) 
-                case 0:
+                case SignalType.SKIP:
                     trade_executor.do_nothing()
             
             strategy.record_action()

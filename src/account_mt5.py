@@ -5,17 +5,6 @@ from src.interfaces import IAccount
 
 class AccountMT5(IAccount):
 
-    balance: float
-    profit: float
-    
-    positions_df: pd.DataFrame
-    positions: dict
-
-    def __init__(self, symbol) -> None:
-        self.balance = self.get_account_balance()
-        self.profit = self.get_account_profit()
-        self.positions = dict()
-        
     def get_account_info(self) -> dict:
         account_info_dict = mt5.account_info()._asdict()
         return account_info_dict

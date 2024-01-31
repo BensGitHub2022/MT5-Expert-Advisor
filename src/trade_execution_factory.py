@@ -1,5 +1,4 @@
-from src.interfaces import ITradeExecutor
-from src.trade_execution_mt5 import TradeExecutorMT5
+from src.trade_executor_mt5 import TradeExecutorMT5
 from src.trade_execution_sim import TradeExecutorSimulator
 
 class TradeExecutionFactory():

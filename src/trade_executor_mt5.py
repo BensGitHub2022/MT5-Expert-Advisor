@@ -1,8 +1,8 @@
-import pandas as pd
-import MetaTrader5 as mt5
 from enum import Enum
-
 from src.shared_helper_functions import calc_lot_size
+from src.signal import Signal
+
+import MetaTrader5 as mt5
 
 #RISK = .02
 
@@ -17,7 +17,7 @@ class TradeExecutorMT5():
         self.current_lot_size = 0.0
         self.account_info = account
     
-    def place_order(self, symbol, signal, price, deviation) -> bool:
+    def place_order(self, symbol, signal: Signal, price, deviation, close_position = False) -> bool:
 
         volume = calc_lot_size(price, self.account_info.get_account_balance())
 
@@ -25,7 +25,7 @@ class TradeExecutorMT5():
             "action": TradeAction['market_order'].value,
             "symbol": symbol,
             "volume": round(float(volume),2),
-            "type": OrderType[signal['action_str']].value,
+            "type": OrderType[signal.signal_type.value].value,
             "price": round(float(price),2),
             "deviation": deviation,
             "magic": 100,
@@ -35,8 +35,10 @@ class TradeExecutorMT5():
         }
         
         result = mt5.order_send(request)
+        if result == None:
+            raise RuntimeError('No order trade result returned from MT5. Error is ' + str(mt5.last_error() or ''))
         print(result)
-        print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal['action_str'], symbol,volume,price,deviation))
+        print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal.signal_type.value, symbol,volume,price,deviation))
         
         if result.retcode != mt5.TRADE_RETCODE_DONE:
             print("2. order_send failed, retcode={}".format(result.retcode))
@@ -75,6 +77,8 @@ class TradeExecutorMT5():
         }
 
         result = mt5.order_send(request)
+        if result == None:
+            raise RuntimeError('No order trade result returned from MT5. Error is ' + str(mt5.last_error() or ''))
 
         print("1. order_send: {} position on {} {} lots closed at {} with deviation={} points".format(
             "buy" if position.type == 1 else "sell", 
@@ -98,6 +102,7 @@ class TradeExecutorMT5():
 
         print("2. order_send done, ", result) 
         print("closed POSITION_TICKET={}, profit {}".format(position.ticket, position.profit))
+        return True
     
     def close_all_positions(self, bid, ask, deviation) -> bool:
         positions = self.account_info.get_positions()

@@ -6,6 +6,9 @@ from src.symbols_factory import SymbolsFactory
 from src.context_factory import ContextFactory
 from src.account_factory import AccountFactory
 from src.trade_execution_factory import TradeExecutionFactory
+from backend.api import API, Endpoint
+from backend.handlers import get_open_orders, get_closed_orders
+import threading
 
 import pandas as pd
 
@@ -24,7 +27,25 @@ NEXT = 1
 
 PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
+# SERVER SETUP
+def flask_init():
+    endpoints = []
+
+    ep = Endpoint("/orders-open", get_open_orders)
+    endpoints.append(ep)
+    ep = Endpoint("/orders-closed", get_closed_orders)
+    endpoints.append(ep)
+
+    api = API(__name__, endpoints)
+    api.run()
+
 def main():
+
+    # Must run flask server on seperate thread, because
+    # it blocks the main thread otherwise
+    flask_thread = threading.Thread(target=flask_init)
+    flask_thread.start()
+
     print("Hello Trade Bot!")
 
     # Composition root

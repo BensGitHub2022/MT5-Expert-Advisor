@@ -47,7 +47,7 @@ class EmaStrategy(IStrategy):
     # This is relied upon and essential to the strategy
     current_candlestick_time: int # Current candlestick time pulled from the most recent candlestick
 
-    def __init__(self, symbol: str, timeframe:str, ema_short:int, ema_long:int) -> None:
+    def __init__(self, symbol: str, timeframe:str, ema_short:int, ema_long:int, action_writer: object) -> None:
         """
         Constructor for EmaStrategy
         :param symbol: the symbol which is the focus of the ema strategy, passed as a string
@@ -68,10 +68,10 @@ class EmaStrategy(IStrategy):
         self.action_str = ''
         self.signal = {'action': self.action, 'action_str': self.action_str}
 
-        self.action_writer = ActionWriter()
+        self.action_writer = action_writer
         self.initialized = False
         self.frequency = 500
-        self.duration = 2000
+        self.duration = 250 # Alter duration to speed up program or comment out the Windsound's
         
     def process_seed(self, df: object) -> bool:
         """
@@ -153,7 +153,7 @@ class EmaStrategy(IStrategy):
         self.action_df.loc[self.ema_long,'action_str'] = self.action_str
         self.signal = {'action': self.action, 'action_str': self.action_str}
 
-        return self.signal
+        return self.signal # Use tuple instead of dict here? Seems more appropriate
     
     def record_action(self) -> bool:
         if(not self.initialized):

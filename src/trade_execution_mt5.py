@@ -2,7 +2,9 @@ import pandas as pd
 import MetaTrader5 as mt5
 from enum import Enum
 
-RISK = .02
+from src.shared_helper_functions import calc_lot_size
+
+#RISK = .02
 
 class TradeExecutorMT5():
 
@@ -14,19 +16,10 @@ class TradeExecutorMT5():
         self.current_risk_per_trade = 0.0
         self.current_lot_size = 0.0
         self.account_info = account
-
-    def calc_risk_per_trade(self) -> float:
-        self.current_risk_per_trade = self.account_info.get_account_balance() * RISK
-        return self.current_risk_per_trade
     
-    def calc_lot_size(self, price) -> float:
-        self.current_risk_per_trade = self.calc_risk_per_trade()
-        self.current_lot_size = self.current_risk_per_trade / price
-        return self.current_lot_size
-
     def place_order(self, symbol, signal, price, deviation) -> bool:
 
-        volume = self.calc_lot_size(price)
+        volume = calc_lot_size(price, self.account_info.get_account_balance())
 
         request = {
             "action": TradeAction['market_order'].value,
@@ -42,7 +35,7 @@ class TradeExecutorMT5():
         }
         
         result = mt5.order_send(request)
-
+        print(result)
         print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal['action_str'], symbol,volume,price,deviation))
         
         if result.retcode != mt5.TRADE_RETCODE_DONE:

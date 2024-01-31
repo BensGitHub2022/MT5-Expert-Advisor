@@ -72,8 +72,13 @@ class SymbolsSimulator(ISymbols):
 
     def get_symbol_info_ask(self) -> float:
         symbol_info_tick = self.get_symbol_info_tick()
-        symbol_info_ask = symbol_info_tick['ask']
+        symbol_info_ask = symbol_info_tick['ask'][0]
         return symbol_info_ask
+    
+    def get_tick_time(self) -> int:
+        symbol_info_tick = self.get_symbol_info_tick()
+        symbol_info_time = symbol_info_tick['time'][0]
+        return symbol_info_time
 
     def get_ticks(self, num_ticks, current_time = 0) -> pd.DataFrame:
         pass

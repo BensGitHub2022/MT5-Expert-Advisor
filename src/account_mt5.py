@@ -7,18 +7,14 @@ class AccountMT5(IAccount):
 
     balance: float
     profit: float
-
-    ticket: int # do we use this ticket variable in live implementation ?
-    symbol: object # should we pass a symbol object to this class ? 
     
     positions_df: pd.DataFrame
     positions: dict
 
-    def __init__(self) -> None:
+    def __init__(self, symbol) -> None:
         self.balance = self.get_account_balance()
         self.profit = self.get_account_profit()
         self.positions = dict()
-        # self.positions_df = pd.DataFrame() # Not used
         
     def get_account_info(self) -> dict:
         account_info_dict = mt5.account_info()._asdict()
@@ -34,11 +30,11 @@ class AccountMT5(IAccount):
         profit = account_info_dict['profit']
         return profit
     
-    def get_positions(self) -> dict:
+    def get_positions(self) -> tuple: # Note on 1.21.24 that MT5 returns positions as a named Tuple
         self.positions = mt5.positions_get()
         return self.positions
     
-    # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame
+    # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame # 1.21.24 - positions are actually Tuples
     """
     def get_positions_df(self) -> pd.DataFrame:
         self.get_positions()

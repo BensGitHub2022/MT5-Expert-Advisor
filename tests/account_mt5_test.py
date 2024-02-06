@@ -23,7 +23,6 @@ class AccountMT5Tests(unittest.TestCase):
     def test_get_account_balance(self, account_info_query):
         account_info_query.return_value = self.account_info_response
         assert self.account.get_account_balance() == self.balance
-        assert True
     
     @patch('src.account_mt5.mt5.account_info')
     def test_get_account_profit(self, account_info_query):

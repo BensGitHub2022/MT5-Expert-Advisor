@@ -6,7 +6,7 @@ class AccountMT5(IAccount):
 
     def get_account_info(self) -> dict:
         account_info = mt5.account_info()
-        if account_info == None:
+        if account_info is None:
             raise RuntimeError('No account info returned from MT5. Error is ' + str(mt5.last_error() or ''))
         return account_info._asdict()
     
@@ -22,7 +22,7 @@ class AccountMT5(IAccount):
     
     def get_positions(self) -> tuple: # Note on 1.21.24 that MT5 returns positions as a named Tuple
         positions = mt5.positions_get()
-        if positions == None:
+        if positions is None:
             raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
         return positions
 

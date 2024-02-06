@@ -44,7 +44,7 @@ class SymbolMT5(ISymbol):
     
     def get_symbol_info(self) -> bool:
         symbol_info = mt5.symbol_info(self.symbol_name)
-        if symbol_info == None:
+        if symbol_info is None:
             raise RuntimeError('No symbol info returned from MT5. Error is ' + str(mt5.last_error() or ''))
         return symbol_info._asdict()
     
@@ -60,7 +60,7 @@ class SymbolMT5(ISymbol):
     
     def get_symbol_info_tick(self) -> dict:
         symbol_info_tick = mt5.symbol_info_tick(self.symbol_name)
-        if symbol_info_tick == None:
+        if symbol_info_tick is None:
             error = mt5.last_error()
             raise RuntimeError('No symbol info tick returned from MT5. Error is ' + str(mt5.last_error() or ''))
         return symbol_info_tick._asdict()

@@ -34,7 +34,7 @@ class TradeExecutorMT5():
         }
         
         result = mt5.order_send(request)
-        if result == None:
+        if result is None:
             raise RuntimeError('Error sending order: ' + str(mt5.last_error() or ''))
         print("result of order: ")
         print(result)

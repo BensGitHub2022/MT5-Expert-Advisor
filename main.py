@@ -30,18 +30,15 @@ PRODUCTION = False # added for convenience, all factories eventually created in 
 def flask_init():
     endpoints = []
 
-    ep = Endpoint("/orders-open", get_open_orders)
-    endpoints.append(ep)
-    ep = Endpoint("/orders-closed", get_closed_orders)
-    endpoints.append(ep)
+    endpoints.append(Endpoint("/orders-open", get_open_orders))
+    endpoints.append(Endpoint("/orders-closed", get_closed_orders))
 
     api = API(__name__, endpoints)
     api.run()
 
 def main():
 
-    # Must run flask server on seperate thread, because
-    # it blocks the main thread otherwise
+    # Avoid blocking main thread
     flask_thread = threading.Thread(target=flask_init)
     flask_thread.start()
 

@@ -27,7 +27,7 @@ class IStrategy(abc.ABC):
         pass
     """
 
-class ISymbols(abc.ABC):
+class ISymbol(abc.ABC):
     
     @abc.abstractmethod
     def get_candlesticks(self, num_candlesticks) -> object:

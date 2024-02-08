@@ -1,11 +1,10 @@
 from src.json_reader import JsonReader
-from src.trade_bot import TradeBot
 from src.action_writer import ActionWriter
 from src.ema_strategy import EmaStrategy
-from src.symbols_factory import SymbolsFactory
+from src.symbol_factory import SymbolFactory
 from src.context_factory import ContextFactory
 from src.account_factory import AccountFactory
-from src.trade_execution_factory import TradeExecutionFactory
+from src.trade_executor_factory import TradeExecutionFactory
 from backend.api import API, Endpoint
 from backend.handlers import get_open_orders, get_closed_orders
 import threading
@@ -64,7 +63,7 @@ def main():
     action_writer = ActionWriter()
     strategy = EmaStrategy(symbol,timeframe,EMA_SHORT,EMA_LONG, action_writer)
     
-    symbol_factory = SymbolsFactory(production=PRODUCTION)
+    symbol_factory = SymbolFactory(production=PRODUCTION)
     symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION) # Mock
     # symbol = symbol_factory.create_symbol(symbol,timeframe) # Production
     print("Using the " + strategy.get_strategy_name() + ", trading on " + symbol.get_symbol_name())

@@ -1,13 +1,14 @@
 import MetaTrader5 as mt5
-import pandas as pd
 
 from src.interfaces import IAccount
 
 class AccountMT5(IAccount):
 
     def get_account_info(self) -> dict:
-        account_info_dict = mt5.account_info()._asdict()
-        return account_info_dict
+        account_info = mt5.account_info()
+        if account_info is None:
+            raise RuntimeError('No account info returned from MT5. Error is ' + str(mt5.last_error() or ''))
+        return account_info._asdict()
     
     def get_account_balance(self) -> float:
         account_info_dict = self.get_account_info()
@@ -20,9 +21,11 @@ class AccountMT5(IAccount):
         return profit
     
     def get_positions(self) -> tuple: # Note on 1.21.24 that MT5 returns positions as a named Tuple
-        self.positions = mt5.positions_get()
-        return self.positions
-    
+        positions = mt5.positions_get()
+        if positions is None:
+            raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
+        return positions
+
     # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame # 1.21.24 - positions are actually Tuples
     """
     def get_positions_df(self) -> pd.DataFrame:

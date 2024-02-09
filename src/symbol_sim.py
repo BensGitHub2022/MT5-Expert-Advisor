@@ -2,14 +2,12 @@ import numpy as np
 import pandas as pd
 from enum import Enum
 
-from src.interfaces import ISymbols
+from src.interfaces import ISymbol
 
-from datetime import datetime
-from datetime import timedelta
 from datetime import timezone
 
 
-class SymbolsSimulator(ISymbols):
+class SymbolSimulator(ISymbol):
 
     ### Unique to Mock class ###
     candles_df_master: pd.DataFrame

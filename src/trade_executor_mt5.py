@@ -35,7 +35,7 @@ class TradeExecutorMT5():
         }
         
         result = mt5.order_send(request)
-        if result == None:
+        if result is None:
             raise RuntimeError('No order trade result returned from MT5. Error is ' + str(mt5.last_error() or ''))
         print(result)
         print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal.signal_type.value, symbol,volume,price,deviation))

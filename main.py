@@ -5,7 +5,7 @@ from src.ema_strategy import EmaStrategy
 from src.json_reader import JsonReader
 from src.signal import Signal
 from src.signal_type import SignalType
-from src.symbols_factory import SymbolsFactory
+from src.symbol_factory import SymbolFactory
 from src.trade_execution_factory import TradeExecutionFactory
 
 import pandas as pd
@@ -23,7 +23,7 @@ EMA_LONG = 8
 INTERVAL = EMA_LONG+1
 NEXT = 1
 
-PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
+PRODUCTION = True # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
     print("Hello Trade Bot!")
@@ -44,7 +44,7 @@ def main():
     action_writer = ActionWriter()
     strategy = EmaStrategy(symbol,timeframe,EMA_SHORT,EMA_LONG, action_writer)
     
-    symbol_factory = SymbolsFactory(production=PRODUCTION)
+    symbol_factory = SymbolFactory(production=PRODUCTION)
     symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION) # Mock
     # symbol = symbol_factory.create_symbol(symbol,timeframe) # Production
     print("Using the " + strategy.get_strategy_name() + ", trading on " + symbol.get_symbol_name())

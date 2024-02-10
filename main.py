@@ -5,8 +5,8 @@ from src.symbol_factory import SymbolFactory
 from src.context_factory import ContextFactory
 from src.account_factory import AccountFactory
 from src.trade_executor_factory import TradeExecutionFactory
-from backend.api import API, Endpoint
-from backend.handlers import get_open_orders, get_closed_orders
+from api.api import API, Endpoint
+from api.handlers import get_open_orders, get_closed_orders
 import threading
 
 import pandas as pd

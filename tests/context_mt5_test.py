@@ -1,9 +1,11 @@
+import json
 import unittest
+
+import pytest
+
 from mock import patch
 from src.context_mt5 import ContextMT5
 
-import json
-import pytest
 
 class ContextMT5Tests(unittest.TestCase):
     

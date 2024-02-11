@@ -1,9 +1,11 @@
+import unittest
 from collections import namedtuple
+
+import pytest
+
 from mock import patch
 from src.symbol_mt5 import SymbolMT5
 
-import pytest
-import unittest
 
 class SymbolMT5Tests(unittest.TestCase):
     

@@ -10,8 +10,8 @@ class ContextFactory():
     def __init__(self, production: bool):
         self.production = production
 
-    def create_context(self, json_settings: dict, credentials: dict) -> IContext:
+    def create_context(self, credentials: dict) -> IContext:
         if (self.production):
-            return ContextMT5(json_settings, credentials)
+            return ContextMT5(credentials)
         else:
-            return ContextSimulator(json_settings, credentials)
+            return ContextSimulator(credentials)

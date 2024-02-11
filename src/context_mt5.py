@@ -4,16 +4,13 @@ from src.interfaces import IContext
 
 class ContextMT5(IContext): 
 
-    json_settings: dict
     credentials: dict
 
-    def __init__(self, json_settings: dict, credentials: dict):
+    def __init__(self, credentials: dict):
         """
         Initializes MetaTrader object
-        :param json_settings: A dict containing symbol trading details.
         :param credentials: A dict containing MetaTrader5 login details.
         """
-        self.json_settings = json_settings
         self.credentials = credentials
 
     def connect(self) -> bool:
@@ -27,7 +24,7 @@ class ContextMT5(IContext):
             login = self.credentials["mt5"]["login"]
             password = self.credentials["mt5"]["password"]
             server = self.credentials["mt5"]["server"]
-            timeout = self.json_settings["mt5"]["timeout"]
+            timeout = self.credentials["mt5"]["timeout"]
 
             initialized = mt5.initialize(
                 pathway, login=login, password=password, server=server, timeout=timeout

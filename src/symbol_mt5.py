@@ -83,6 +83,9 @@ class SymbolMT5(ISymbol):
     
     def get_symbol_name(self) -> str:
         return self.symbol_name
+    
+    def get_symbol_timeframe(self) -> str:
+        return self.timeframe
 
     def get_mt5_timeframe(self, timeframe: str):
         """

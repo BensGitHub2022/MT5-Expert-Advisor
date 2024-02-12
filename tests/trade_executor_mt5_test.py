@@ -1,11 +1,12 @@
+import sys
+import unittest
 from collections import namedtuple
+
+import pytest
+
 from mock import MagicMock, patch
 from src.account_mt5 import AccountMT5
 from src.trade_executor_mt5 import TradeExecutorMT5
-
-import pytest
-import sys
-import unittest
 
 sys.modules['mt5'] = MagicMock()
 

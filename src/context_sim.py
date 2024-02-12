@@ -1,6 +1,7 @@
 
 from src.interfaces import IContext
 
+
 class ContextSimulator(IContext):
 
     json_settings: dict

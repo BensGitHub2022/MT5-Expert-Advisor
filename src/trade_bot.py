@@ -1,7 +1,9 @@
 
 import threading
 import time
-from src.interfaces import IStrategy, IContext
+
+from src.interfaces import IContext, IStrategy
+
 
 class TradeBot(object):
     

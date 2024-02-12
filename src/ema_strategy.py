@@ -209,8 +209,8 @@ class EmaStrategy(IStrategy):
         rounded_delta = int(round(delta.total_seconds()))
         return rounded_delta
 
-    def set_current_candlestick_time(self, candlestick_time: int) -> None:
-        self.current_candlestick_time = candlestick_time
+    def set_current_candlestick_time(self) -> None:
+        self.current_candlestick_time = self.symbol.get_candlestick_time()
 
     def get_current_candlestick_time(self) -> int:
         return self.current_candlestick_time

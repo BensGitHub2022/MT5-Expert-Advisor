@@ -49,7 +49,7 @@ class TradeBot(object):
         print("Using the " + self.strategy.get_strategy_name() + ", trading on " + self.symbol.get_symbol_name())
         print(self.account.get_positions())
 
-        self.strategy.set_current_candlestick_time(self.symbol.get_candlestick_time())
+        self.strategy.set_current_candlestick_time()
         self.strategy.process_seed()
 
         self.strategy.record_action()

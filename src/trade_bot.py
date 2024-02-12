@@ -1,7 +1,9 @@
 import threading
 
-from src.interfaces import IStrategy, IContext, ISymbol, IAccount, ITradeExecutor
 from src.action_writer import ActionWriter
+from src.interfaces import (IAccount, IContext, IStrategy, ISymbol,
+                            ITradeExecutor)
+
 
 class TradeBot(object):
     

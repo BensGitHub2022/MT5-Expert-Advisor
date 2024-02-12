@@ -6,10 +6,8 @@ from src.context_factory import ContextFactory
 from src.ema_strategy import EmaStrategy
 from src.json_reader import JsonReader
 from src.symbol_factory import SymbolFactory
-from src.trade_executor_factory import TradeExecutionFactory
 from src.trade_bot import TradeBot
-
-import pandas as pd
+from src.trade_executor_factory import TradeExecutionFactory
 
 # Path to MetaTrader5 login details.
 ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
@@ -20,9 +18,6 @@ TICKS_MOCK_LOCATION = "mock/ticks_current.csv"
 
 EMA_SHORT = 5
 EMA_LONG = 8
-
-INTERVAL = EMA_LONG+1
-NEXT = 1
 
 PRODUCTION = True # added for convenience, all factories eventually created in main and passed to trade_bot
 

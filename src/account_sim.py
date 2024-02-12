@@ -1,11 +1,10 @@
+from collections import namedtuple
+from datetime import datetime, timedelta, timezone
+
 import pandas as pd
 
 from src.interfaces import IAccount
 
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
-from collections import namedtuple
 
 class AccountSimulator(IAccount):
     

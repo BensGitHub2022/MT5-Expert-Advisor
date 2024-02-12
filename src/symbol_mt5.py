@@ -1,13 +1,12 @@
+from datetime import datetime, timedelta, timezone
+from enum import Enum
+
+import MetaTrader5 as mt5
 import numpy as np
 import pandas as pd
-from enum import Enum
-import MetaTrader5 as mt5
 
 from src.interfaces import ISymbol
 
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
 
 class SymbolMT5(ISymbol):
 

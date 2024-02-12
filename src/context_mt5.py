@@ -2,6 +2,7 @@ import MetaTrader5 as mt5
 
 from src.interfaces import IContext
 
+
 class ContextMT5(IContext): 
 
     credentials: dict

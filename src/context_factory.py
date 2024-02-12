@@ -1,7 +1,8 @@
 
-from src.interfaces import IContext
 from src.context_mt5 import ContextMT5
 from src.context_sim import ContextSimulator
+from src.interfaces import IContext
+
 
 class ContextFactory():
 

@@ -1,10 +1,10 @@
-import numpy as np
-import pandas as pd
+from datetime import timezone
 from enum import Enum
 
-from src.interfaces import ISymbol
+import numpy as np
+import pandas as pd
 
-from datetime import timezone
+from src.interfaces import ISymbol
 
 
 class SymbolSimulator(ISymbol):

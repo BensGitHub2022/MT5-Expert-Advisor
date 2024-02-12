@@ -1,5 +1,6 @@
 import abc
 
+
 # Meta trade interface - to abstract away and isolate MetaTrader SDK calls
 class IContext(abc.ABC):
 

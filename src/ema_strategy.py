@@ -1,10 +1,9 @@
-import pandas as pd
-import talib as ta
 import time
 import winsound
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
+from datetime import datetime, timedelta, timezone
+
+import pandas as pd
+import talib as ta
 
 from src.interfaces import IStrategy
 from src.action_writer import ActionWriter

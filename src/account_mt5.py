@@ -2,6 +2,7 @@ import MetaTrader5 as mt5
 
 from src.interfaces import IAccount
 
+
 class AccountMT5(IAccount):
 
     def get_account_info(self) -> dict:

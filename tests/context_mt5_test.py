@@ -47,7 +47,6 @@ class ContextMT5Tests(unittest.TestCase):
         with pytest.raises(PermissionError):
             self.context_with_complete_creds.connect()
     
-    # I think this is what you mean
     def test_connect_credential_value_missing(self):
         context_with_no_credentials = ContextMT5({})
         with pytest.raises(KeyError):

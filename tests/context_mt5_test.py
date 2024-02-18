@@ -11,12 +11,6 @@ class ContextMT5Tests(unittest.TestCase):
     
     context_with_complete_creds: ContextMT5
     
-    settings = json.loads("""{
-        "mt5": {
-            "symbols": ["EURJPY"],
-            "timeframe": 60000
-        }
-    }""")
     credentials = json.loads("""{
         "mt5": {
             "server": "MetaQuotes-Demo",
@@ -52,16 +46,10 @@ class ContextMT5Tests(unittest.TestCase):
         mock_login.return_value = False
         with pytest.raises(PermissionError):
             self.context_with_complete_creds.connect()
-
-    # these tests no longer serve a purpose!
-    """
-    def test_connect_setting_value_missing(self):
-        context_with_no_settings = ContextMT5({}, self.credentials)
-        with pytest.raises(KeyError):
-            context_with_no_settings.connect()
     
+    # I think this is what you mean
     def test_connect_credential_value_missing(self):
-        context_with_no_credentials = ContextMT5(self.settings, {})
+        context_with_no_credentials = ContextMT5({})
         with pytest.raises(KeyError):
             context_with_no_credentials.connect()
-    """
+    

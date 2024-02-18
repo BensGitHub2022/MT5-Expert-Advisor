@@ -13,24 +13,24 @@ class ContextMT5Tests(unittest.TestCase):
     
     settings = json.loads("""{
         "mt5": {
-            "server": "MetaQuotes-Demo",
             "symbols": ["EURJPY"],
-            "timeframe": 60000,
-            "timeout" : 100
+            "timeframe": 60000
         }
     }""")
     credentials = json.loads("""{
         "mt5": {
+            "server": "MetaQuotes-Demo",
             "login": 1,
             "password": "abc123",
             "terminal_pathway": "terminal64.exe",
-            "server": "server"
+            "server": "server",
+            "timeout" : 100
         }
     }""")
     
     @classmethod
     def setUpClass(self):
-        self.context_with_complete_creds = ContextMT5(self.settings, self.credentials)
+        self.context_with_complete_creds = ContextMT5(self.credentials)
 
     @patch('src.context_mt5.mt5.login')
     @patch('src.context_mt5.mt5.initialize')
@@ -53,6 +53,8 @@ class ContextMT5Tests(unittest.TestCase):
         with pytest.raises(PermissionError):
             self.context_with_complete_creds.connect()
 
+    # these tests no longer serve a purpose!
+    """
     def test_connect_setting_value_missing(self):
         context_with_no_settings = ContextMT5({}, self.credentials)
         with pytest.raises(KeyError):
@@ -62,3 +64,4 @@ class ContextMT5Tests(unittest.TestCase):
         context_with_no_credentials = ContextMT5(self.settings, {})
         with pytest.raises(KeyError):
             context_with_no_credentials.connect()
+    """

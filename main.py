@@ -13,13 +13,13 @@ from src.trade_executor_factory import TradeExecutionFactory
 ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
 CREDENTIALS_FILE_PATH = "pkg/credentials.json"
 
-CANDLES_MOCK_LOCATION = "mock/candlesticks_current.csv"
-TICKS_MOCK_LOCATION = "mock/ticks_current.csv"
+CANDLES_MOCK_LOCATION = "mock/BCHUSD_candlesticks_from_1672531500_to_1704067080.csv"
+TICKS_MOCK_LOCATION = "mock/BCHUSD_ticks_from_1672531500_to_1704067080.csv"
 
-EMA_SHORT = 5
-EMA_LONG = 8
+EMA_SHORT = 50
+EMA_LONG = 250
 
-PRODUCTION = True # added for convenience, all factories eventually created in main and passed to trade_bot
+PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
     print("Hello Trade Bot!")
@@ -40,7 +40,7 @@ def main():
     symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION)
 
     account_factory = AccountFactory(production=PRODUCTION)
-    account = account_factory.create_account(symbol, balance = 99747.35, profit = 0, action_writer=action_writer)
+    account = account_factory.create_account(symbol, balance = 100000, profit = 0, action_writer=action_writer)
 
     trade_execution_factory = TradeExecutionFactory(production=PRODUCTION)
     trade_executor = trade_execution_factory.create_trade_executor(account)

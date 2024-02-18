@@ -1,4 +1,3 @@
-from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 
 import pandas as pd
@@ -14,8 +13,11 @@ class AccountSimulator(IAccount):
     ticket: int
     symbol: object 
     
+    last_position_df: pd.DataFrame
     positions_df: pd.DataFrame
     positions: dict
+
+    account_df: pd.DataFrame
 
     action_writer: object
 
@@ -25,30 +27,39 @@ class AccountSimulator(IAccount):
         self.ticket = 500000000
         self.positions = dict()
         self.positions_df = pd.DataFrame(columns=['symbol','ticket','time','type','volume','price','current_price','profit'])
+        d = {'balance': [self.balance], 'real_profit': [self.profit]}
+        self.account_df = pd.DataFrame(data=d)
         self.symbol = symbol
         self.action_writer = action_writer
 
-    def update_balance(self, capital_committed) -> None:
+    def update_balance(self, capital_committed) -> float:
         self.balance += capital_committed
+        return self.balance
 
-    def update_profit(self, profit) -> None:
+    def update_profit(self, profit) -> float:
         self.profit += profit
+        return self.profit
+
+    def update_account(self) -> bool:
+        old_profit = self.account_df['real_profit'][0]
+        old_balance = self.account_df['balance'][0]
+        self.account_df['real_profit'].replace(old_profit,self.profit,inplace=True)
+        self.account_df['balance'].replace(old_balance,self.balance,inplace=True)
+        return True
 
     def get_account_balance(self) -> float:
         return self.balance
         
     def add_position(self, symbol, type, volume, price) -> bool:
-        #time = self.get_date_time_now() # change this to match candlestick time ? 1.27.24 - updated
         time = self.symbol.get_tick_time()
         current_price = price 
         d = {'symbol': symbol,'ticket':self.ticket,'time':time,'type':type,'volume':volume,'price':price,'current_price':current_price,'profit':self.calc_profit(type, price, current_price)}
         new_position_df = pd.DataFrame(data=[d])
-        self.record_position(new_position_df)
         self.positions_df = pd.concat([self.positions_df, new_position_df], ignore_index=True)
         self.ticket += 1
         return True
 
-    def remove_position(self, ticket) -> tuple:
+    def remove_position(self, ticket) -> bool:
         position = self.positions_df.loc[self.positions_df['ticket']==ticket]
         volume = position['volume'][0]
         price = position['price'][0]
@@ -58,21 +69,26 @@ class AccountSimulator(IAccount):
         real_profit = volume*profit
         returned_capital = self.calc_capital_gain_loss(type,volume,current_price,price,real_profit)
 
-        capital_and_profit = namedtuple('trade_results',['capital','profit'])
-        balance_update = capital_and_profit(returned_capital,real_profit)
-
         row_index = self.positions_df.index[self.positions_df['ticket'] == ticket][0]
         self.positions_df.drop([row_index],axis=0,inplace=True)
-        return balance_update
+        
+        self.last_position_df = position
+        self.update_balance(returned_capital)
+        self.update_profit(real_profit)
+        self.update_account()
+        self.record_position(self.last_position_df, self.account_df)
+        return True
     
     def update_position(self, ticket) -> bool:
         position = self.positions_df.loc[self.positions_df['ticket']==ticket]
+        volume = position['volume'][0]
         type = position['type'][0]
         price = position['price'][0]
         current_price = self.get_current_price(type)
         profit = self.calc_profit(type, price, current_price)
+        real_profit = profit*volume
         old_profit=position['profit'][0]
-        self.positions_df['profit'].replace(old_profit,profit,inplace=True)
+        self.positions_df['profit'].replace(old_profit,real_profit,inplace=True)
         old_price = position['current_price'][0]
         self.positions_df['current_price'].replace(old_price,current_price,inplace=True)
         return True
@@ -135,7 +151,7 @@ class AccountSimulator(IAccount):
         self.symbol = symbol
         return self.symbol
 
-    def record_position(self, position_df) -> bool:
-        self.action_writer.record_position(position_df)
+    def record_position(self, position_df, action_df) -> bool:
+        self.action_writer.record_position(position_df, action_df)
         self.action_writer.write_position()
         return True

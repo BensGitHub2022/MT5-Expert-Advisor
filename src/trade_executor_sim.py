@@ -33,9 +33,7 @@ class TradeExecutorSimulator():
     def close_position(self, position, bid, ask, deviation) -> bool:
         ticket = position.ticket
         self.account_info.update_position(ticket)
-        balance_update = self.account_info.remove_position(ticket)
-        self.account_info.update_balance(balance_update.capital)
-        self.account_info.update_profit(balance_update.profit)
+        self.account_info.remove_position(ticket)
         return True
     
     def close_all_positions(self, bid, ask, deviation) -> bool:

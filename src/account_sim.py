@@ -66,15 +66,15 @@ class AccountSimulator(IAccount):
         current_price = position['current_price'][0]
         profit = position['profit'][0]
         type = position['type'][0]
-        real_profit = volume*profit
-        returned_capital = self.calc_capital_gain_loss(type,volume,current_price,price,real_profit)
+        #real_profit = volume*profit
+        returned_capital = self.calc_capital_gain_loss(type,volume,current_price,price,profit)
 
         row_index = self.positions_df.index[self.positions_df['ticket'] == ticket][0]
         self.positions_df.drop([row_index],axis=0,inplace=True)
         
         self.last_position_df = position
         self.update_balance(returned_capital)
-        self.update_profit(real_profit)
+        self.update_profit(profit)
         self.update_account()
         self.record_position(self.last_position_df, self.account_df)
         return True

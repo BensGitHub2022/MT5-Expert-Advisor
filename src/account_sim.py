@@ -66,7 +66,7 @@ class AccountSimulator(IAccount):
         current_price = position['current_price'][0]
         profit = position['profit'][0]
         type = position['type'][0]
-        #real_profit = volume*profit
+        #real_profit = volume*profit #NOTE: This was a bug - this was being performed in both and was being double counted
         returned_capital = self.calc_capital_gain_loss(type,volume,current_price,price,profit)
 
         row_index = self.positions_df.index[self.positions_df['ticket'] == ticket][0]

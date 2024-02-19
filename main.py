@@ -13,11 +13,11 @@ from src.trade_executor_factory import TradeExecutionFactory
 ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
 CREDENTIALS_FILE_PATH = "pkg/credentials.json"
 
-CANDLES_MOCK_LOCATION = "mock/SOLUSD_candlesticks_from_1672531500_to_1704067080.csv"
-TICKS_MOCK_LOCATION = "mock/SOLUSD_ticks_from_1672531500_to_1704067080.csv"
+CANDLES_MOCK_LOCATION = "mock/BTCUSD_candlesticks_from_1672531500_to_1688083080.csv"
+TICKS_MOCK_LOCATION = "mock/BTCUSD_ticks_from_1672531500_to_1688083080.csv"
 
-EMA_SHORT = 50
-EMA_LONG = 250
+EMA_SHORT = 500
+EMA_LONG = 1000
 
 PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 

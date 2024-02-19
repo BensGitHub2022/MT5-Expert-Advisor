@@ -14,3 +14,5 @@ BCHUSD_ticks_from_1672531500_to_1704067080.csv
 
 SOLUSD_candlesticks_from_1672531500_to_1704067080.csv
 SOLUSD_ticks_from_1672531500_to_1704067080.csv
+
+mock/*.csv

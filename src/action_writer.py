@@ -1,8 +1,7 @@
+from datetime import datetime, timedelta, timezone
+
 import pandas as pd
 
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
 
 class ActionWriter():
 
@@ -56,8 +55,8 @@ class ActionWriter():
 
         pd.DataFrame.to_csv(self.position_history_df, self.position_history_filepath, index=False, header=isheader, mode='a')
 
-    def record_position(self, df: pd.DataFrame) -> pd.DataFrame:
-        self.position_history_df = df
+    def record_position(self, df: pd.DataFrame, account_df: pd.DataFrame) -> pd.DataFrame:
+        self.position_history_df = pd.merge(df, account_df, how='inner',left_index=True,right_index=True)
         return self.position_history_df
     
     def get_date_time_now(self) -> str:

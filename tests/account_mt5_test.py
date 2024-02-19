@@ -1,9 +1,11 @@
+import unittest
 from collections import namedtuple
+
+import pytest
+
 from mock import patch
 from src.account_mt5 import AccountMT5
 
-import pytest
-import unittest
 
 class AccountMT5Tests(unittest.TestCase):
     

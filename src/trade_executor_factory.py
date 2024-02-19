@@ -2,6 +2,7 @@ from src.interfaces import IAccount
 from src.trade_executor_mt5 import TradeExecutorMT5
 from src.trade_executor_sim import TradeExecutorSimulator
 
+
 class TradeExecutionFactory():
 
     production: bool

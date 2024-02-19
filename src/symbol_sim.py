@@ -1,10 +1,10 @@
-import numpy as np
-import pandas as pd
+from datetime import timezone
 from enum import Enum
 
-from src.interfaces import ISymbol
+import numpy as np
+import pandas as pd
 
-from datetime import timezone
+from src.interfaces import ISymbol
 
 
 class SymbolSimulator(ISymbol):
@@ -42,7 +42,6 @@ class SymbolSimulator(ISymbol):
     def get_candlesticks(self, num_candlesticks) -> pd.DataFrame:
         interval = self.counter.__iter__()+num_candlesticks
         if (self.counter.check_index(interval)):
-            # mt5.copy_rates_from_pos(self.symbol, self.mt5_timeframe, self.start_pos, num_candlesticks)
             self.candles_df = self.candles_df_master.iloc[self.counter.__iter__():interval]
             self.counter.__advance__(num_candlesticks)
         return self.candles_df

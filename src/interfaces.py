@@ -67,11 +67,11 @@ class IAccount(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_deal_history() -> dict:
+    def get_deal_history(self) -> dict:
         pass
 
     @abc.abstractmethod
-    def get_account_info() -> dict:
+    def get_account_info(self) -> dict:
         pass
 
 

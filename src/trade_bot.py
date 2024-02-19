@@ -75,7 +75,7 @@ class TradeBot(object):
                 self.strategy.record_action()
                 self.action_writer.print_action()
         
-        print(self.account.get_account_balance()) # 1.21.24 - Need to add this to the action_writer class
+        #print(self.account.get_account_balance()) # 1.21.24 - Need to add this to the action_writer class
         return
 
 def trade_bot_thread_func(inst: TradeBot):

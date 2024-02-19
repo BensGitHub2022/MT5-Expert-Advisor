@@ -1,5 +1,6 @@
 from flask import jsonify
 import MetaTrader5 as meta
+from datetime import datetime
 
 def get_open_orders():
     try:
@@ -24,8 +25,9 @@ def get_open_orders():
         return jsonify({ "error": meta.last_error() }), 500
 
 def get_closed_orders():
+
     try:
-        tuple = meta.history_deals_get()
+        tuple = meta.history_deals_get(datetime(2010, 1, 1), datetime.now())
         orders_arr = []
         for o in tuple:
             data = {

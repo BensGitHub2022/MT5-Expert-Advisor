@@ -38,6 +38,7 @@ def main():
 
     # Avoid blocking main thread
     flask_thread = threading.Thread(target=flask_init)
+    flask_thread.daemon = True
     flask_thread.start()
 
     print("Hello Trade Bot!")

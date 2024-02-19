@@ -1,4 +1,5 @@
 import MetaTrader5 as mt5
+from datetime import datetime;
 
 from src.interfaces import IAccount
 
@@ -26,6 +27,11 @@ class AccountMT5(IAccount):
         if positions is None:
             raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
         return positions
+    
+    def get_deal_history(self) -> dict:
+        start = datetime(2010, 1, 1)
+        end = datetime.now()
+        return mt5.history_deals_get(start, end)._asdict()
 
     # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame # 1.21.24 - positions are actually Tuples
     """

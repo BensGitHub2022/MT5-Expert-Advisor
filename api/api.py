@@ -10,7 +10,7 @@ class Endpoint():
         self.name = name
         self.handler = handler
 
-class API():
+class WebService():
     app = None
 
     def __init__(self, name, endpoints: List[Endpoint]):

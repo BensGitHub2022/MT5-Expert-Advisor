@@ -8,7 +8,7 @@ from src.json_reader import JsonReader
 from src.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
 from src.trade_executor_factory import TradeExecutionFactory
-from api.api import API, Endpoint
+from api.api import WebService, Endpoint
 from api.handlers import get_open_orders, get_closed_orders
 import threading
 
@@ -31,8 +31,8 @@ def flask_init():
     endpoints.append(Endpoint("/orders-open", get_open_orders))
     endpoints.append(Endpoint("/orders-closed", get_closed_orders))
 
-    api = API(__name__, endpoints)
-    api.run()
+    ws = WebService(__name__, endpoints)
+    ws.run()
 
 def main():
 

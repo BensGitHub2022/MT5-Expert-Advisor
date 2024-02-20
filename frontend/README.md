@@ -1,6 +1,7 @@
 # MT5-Expert-Advisor Frontend
 
 ## Requirements
+
 1. Node.js v20.11.1
 
 ## Quickstart

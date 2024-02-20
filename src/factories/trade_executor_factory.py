@@ -1,6 +1,6 @@
 from src.interfaces import IAccount
-from src.trade_executor_mt5 import TradeExecutorMT5
-from src.trade_executor_sim import TradeExecutorSimulator
+from src.metatrader.trade_executor_mt5 import TradeExecutorMT5
+from src.sim.trade_executor_sim import TradeExecutorSimulator
 
 
 class TradeExecutionFactory():

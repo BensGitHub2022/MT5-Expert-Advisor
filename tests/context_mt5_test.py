@@ -4,7 +4,7 @@ import unittest
 import pytest
 
 from mock import patch
-from src.context_mt5 import ContextMT5
+from src.metatrader.context_mt5 import ContextMT5
 
 
 class ContextMT5Tests(unittest.TestCase):
@@ -26,21 +26,21 @@ class ContextMT5Tests(unittest.TestCase):
     def setUpClass(self):
         self.context_with_complete_creds = ContextMT5(self.credentials)
 
-    @patch('src.context_mt5.mt5.login')
-    @patch('src.context_mt5.mt5.initialize')
+    @patch('src.metatrader.context_mt5.mt5.login')
+    @patch('src.metatrader.context_mt5.mt5.initialize')
     def test_connect_init_and_login_successful(self, mock_init, mock_login):
         mock_init.return_value = True
         mock_login.return_value = True
         assert self.context_with_complete_creds.connect()
 
-    @patch('src.context_mt5.mt5.initialize')
+    @patch('src.metatrader.context_mt5.mt5.initialize')
     def test_connect_initialization_errors(self, mock_init):
         mock_init.return_value = False
         with pytest.raises(ConnectionError):
             self.context_with_complete_creds.connect()
   
-    @patch('src.context_mt5.mt5.login')
-    @patch('src.context_mt5.mt5.initialize')
+    @patch('src.metatrader.context_mt5.mt5.login')
+    @patch('src.metatrader.context_mt5.mt5.initialize')
     def test_connect_login_errors(self, mock_init, mock_login):
         mock_init.return_value = True
         mock_login.return_value = False

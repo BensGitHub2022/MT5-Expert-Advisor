@@ -15,3 +15,8 @@
 .red {
   color: red;
 }
+
+.th {
+  text-align: left;
+  padding-right: 3rem;
+}

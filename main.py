@@ -2,7 +2,7 @@ import pandas as pd
 
 from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
-from src.metatrader.factories.context_factory import ContextFactory
+from src.factories.context_factory import ContextFactory
 from src.ema_strategy import EmaStrategy
 from src.json_reader import JsonReader
 from src.factories.symbol_factory import SymbolFactory

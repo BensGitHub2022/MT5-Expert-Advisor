@@ -56,6 +56,16 @@ class ITradeExecutor(abc.ABC):
     def calc_lot_size(self) -> float:
         pass
 
+class IAccountSnapshot(abc.ABC):
+
+    @abc.abstractmethod
+    def get_account_balance(self) -> float:
+        pass
+
+    @abc.abstractmethod
+    def update_account_balance(self, new_balance: float) -> bool:
+        pass
+
 class IAccount(abc.ABC):
 
     @abc.abstractmethod
@@ -66,6 +76,11 @@ class IAccount(abc.ABC):
     def get_account_balance(self) -> float:
         pass
 
-    
+    @abc.abstractmethod
+    def get_account_snapshot(self) -> IAccountSnapshot:
+        pass
+
+
+
 
 

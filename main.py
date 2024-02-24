@@ -9,12 +9,15 @@ from src.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
 from src.trade_executor_factory import TradeExecutionFactory
 
+from src.account_snapshot import AccountSnapshot
+from src.web_service.web_service import WebService
+
 # Path to MetaTrader5 login details.
 ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
 CREDENTIALS_FILE_PATH = "pkg/credentials.json"
 
-CANDLES_MOCK_LOCATION = "mock/BTCUSD_candlesticks_from_1672531500_to_1688083080.csv"
-TICKS_MOCK_LOCATION = "mock/BTCUSD_ticks_from_1672531500_to_1688083080.csv"
+CANDLES_MOCK_LOCATION = "mock/SOLUSD_candlesticks_from_1672531500_to_1704067080.csv"
+TICKS_MOCK_LOCATION = "mock/SOLUSD_ticks_from_1672531500_to_1704067080.csv"
 
 EMA_SHORT = 500
 EMA_LONG = 1000
@@ -22,6 +25,7 @@ EMA_LONG = 1000
 PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
+
     print("Hello Trade Bot!")
 
     # Composition root
@@ -46,6 +50,9 @@ def main():
     trade_executor = trade_execution_factory.create_trade_executor(account)
     
     strategy = EmaStrategy(symbol,EMA_SHORT,EMA_LONG, action_writer)
+
+    web_service = WebService(__name__, account.get_account_snapshot())
+    web_service.run()
 
     trade_bot = TradeBot(context,action_writer, strategy, symbol, account, trade_executor)
     trade_bot.start()

@@ -2,8 +2,8 @@ from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 
-from src.interfaces import IAccount
-
+from src.interfaces import IAccount, IAccountSnapshot
+from src.account_snapshot import AccountSnapshot
 
 class AccountSimulator(IAccount):
     
@@ -31,6 +31,10 @@ class AccountSimulator(IAccount):
         self.account_df = pd.DataFrame(data=d)
         self.symbol = symbol
         self.action_writer = action_writer
+        self.account_snapshot = AccountSnapshot(self.balance, self.profit)
+
+    def get_account_snapshot(self) -> IAccountSnapshot:
+        return self.account_snapshot
 
     def update_balance(self, capital_committed) -> float:
         self.balance += capital_committed
@@ -75,6 +79,8 @@ class AccountSimulator(IAccount):
         self.last_position_df = position
         self.update_balance(returned_capital)
         self.update_profit(profit)
+        self.account_snapshot.update_account_balance(self.balance)
+        self.account_snapshot.update_account_profit(self.profit)
         self.update_account()
         self.record_position(self.last_position_df, self.account_df)
         return True

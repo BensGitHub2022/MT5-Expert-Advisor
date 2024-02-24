@@ -1,6 +1,6 @@
 {
     "mt5": {
-        "symbols": ["BTCUSD"],
+        "symbols": ["SOLUSD"],
         "timeframe": "one_minute"
     }
 }

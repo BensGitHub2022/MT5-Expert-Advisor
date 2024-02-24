@@ -1,5 +1,5 @@
-from src.account_mt5 import AccountMT5
-from src.account_sim import AccountSimulator
+from src.metatrader.account_mt5 import AccountMT5
+from src.sim.account_sim import AccountSimulator
 from src.interfaces import IAccount
 
 

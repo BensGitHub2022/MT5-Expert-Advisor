@@ -1,6 +1,6 @@
 from src.interfaces import ISymbol
-from src.symbol_mt5 import SymbolMT5
-from src.symbol_sim import SymbolSimulator
+from src.metatrader.symbol_mt5 import SymbolMT5
+from src.sim.symbol_sim import SymbolSimulator
 
 
 class SymbolFactory():

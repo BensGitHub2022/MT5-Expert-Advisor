@@ -5,8 +5,8 @@ from collections import namedtuple
 import pytest
 
 from mock import MagicMock, patch
-from src.account_mt5 import AccountMT5
-from src.trade_executor_mt5 import TradeExecutorMT5
+from src.metatrader.account_mt5 import AccountMT5
+from src.metatrader.trade_executor_mt5 import TradeExecutorMT5
 
 sys.modules['mt5'] = MagicMock()
 

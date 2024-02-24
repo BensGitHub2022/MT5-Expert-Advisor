@@ -9,7 +9,6 @@ from src.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
 from src.trade_executor_factory import TradeExecutionFactory
 
-from src.account_snapshot import AccountSnapshot
 from src.web_service.web_service import WebService
 
 # Path to MetaTrader5 login details.
@@ -51,7 +50,7 @@ def main():
     
     strategy = EmaStrategy(symbol,EMA_SHORT,EMA_LONG, action_writer)
 
-    web_service = WebService(__name__, account.get_account_snapshot())
+    web_service = WebService(__name__, account)
     web_service.run()
 
     trade_bot = TradeBot(context,action_writer, strategy, symbol, account, trade_executor)

@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, timezone
 
+import json as JSON
 import pandas as pd
 
-from src.interfaces import IAccount, IAccountSnapshot
-from src.account_snapshot import AccountSnapshot
+from src.interfaces import IAccount
 
 class AccountSimulator(IAccount):
     
@@ -31,10 +31,6 @@ class AccountSimulator(IAccount):
         self.account_df = pd.DataFrame(data=d)
         self.symbol = symbol
         self.action_writer = action_writer
-        self.account_snapshot = AccountSnapshot(self.balance, self.profit)
-
-    def get_account_snapshot(self) -> IAccountSnapshot:
-        return self.account_snapshot
 
     def update_balance(self, capital_committed) -> float:
         self.balance += capital_committed
@@ -53,7 +49,18 @@ class AccountSimulator(IAccount):
 
     def get_account_balance(self) -> float:
         return self.balance
-        
+    
+    def get_account_profit(self) -> float:
+        return self.profit
+    
+    def get_account_json(self) -> JSON:
+        account_json = self.account_df.to_json(orient="records")
+        return account_json
+    
+    def get_position_json(self) -> JSON:
+        position_json = self.positions_df.to_json(orient="records")
+        return position_json
+
     def add_position(self, symbol, type, volume, price) -> bool:
         time = self.symbol.get_tick_time()
         current_price = price 
@@ -79,8 +86,6 @@ class AccountSimulator(IAccount):
         self.last_position_df = position
         self.update_balance(returned_capital)
         self.update_profit(profit)
-        self.account_snapshot.update_account_balance(self.balance)
-        self.account_snapshot.update_account_profit(self.profit)
         self.update_account()
         self.record_position(self.last_position_df, self.account_df)
         return True

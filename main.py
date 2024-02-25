@@ -13,8 +13,8 @@ from src.factories.trade_executor_factory import TradeExecutionFactory
 ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
 CREDENTIALS_FILE_PATH = "pkg/credentials.json"
 
-CANDLES_MOCK_LOCATION = "mock/BTCUSD_candlesticks_from_1672531500_to_1688083080.csv"
-TICKS_MOCK_LOCATION = "mock/BTCUSD_ticks_from_1672531500_to_1688083080.csv"
+CANDLES_MOCK_LOCATION = "mock/SOLUSD_candlesticks_from_1704067500_to_1704585480.csv"
+TICKS_MOCK_LOCATION = "mock/SOLUSD_ticks_from_1704067500_to_1704585480.csv"
 
 EMA_SHORT = 500
 EMA_LONG = 1000

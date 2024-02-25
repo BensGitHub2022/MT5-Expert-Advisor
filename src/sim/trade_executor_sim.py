@@ -8,12 +8,6 @@ class TradeExecutorSimulator():
 
     current_risk_per_trade: float 
     current_lot_size: float
-
-    current_profit: float # have we defined yet?
-    
-    positions: dict
-    positions_df: pd.DataFrame # necessary?
-
     account_info: object
 
     def __init__(self, account: object) -> None:

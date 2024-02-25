@@ -27,10 +27,6 @@ class SymbolMT5(ISymbol):
         self.mt5_timeframe = self.get_mt5_timeframe(timeframe)
         self.start_pos = 0
 
-    def set_symbol(self, symbol_name: str, timeframe: str) -> None:
-        self.symbol_name = symbol_name
-        self.timeframe = timeframe
-
     def get_candlesticks(self, num_candlesticks) -> pd.DataFrame:
         self.candles = mt5.copy_rates_from_pos(self.symbol_name, self.mt5_timeframe, self.start_pos, num_candlesticks)
         self.candles_df = pd.DataFrame(self.candles)
@@ -97,21 +93,6 @@ class SymbolMT5(ISymbol):
         except KeyError as e:
             print(f"{timeframe} is not a legal timeframe. {e}")
             raise e
-        
-    ### These setter methods are not relied upon for the strategy ###
-    # Adjusts which candle you want to start from 
-    def set_candlesticks_start_pos(self, start_pos=0) -> None:
-        self.start_pos = start_pos
-
-    # Adjust which time you want to start tick retrieval from
-    def set_ticks_date(self,current_time=0) -> None:
-        if (current_time != 0):
-            # tz_UTC = pytz.timezone('GMT')
-            offset = timedelta(hours=2.0)
-            tz_UTC_offset = timezone(offset,'GMT')
-            self.current_time = datetime.now(tz_UTC_offset)
-        else:
-            self.current_time = 0
 
 class Timeframe(Enum):
     one_minute = mt5.TIMEFRAME_M1

@@ -47,8 +47,13 @@ class AccountSimulator(IAccount):
         self.account_df['balance'].replace(old_balance,self.balance,inplace=True)
         return True
 
+    # NOTE: Potential use for web service api
     def get_account_balance(self) -> float:
         return self.balance
+    
+    # NOTE: Potential use for web service api
+    def get_account_profit(self) -> float:
+        return self.profit
         
     def add_position(self, symbol, type, volume, price) -> bool:
         time = self.symbol.get_tick_time()
@@ -66,7 +71,6 @@ class AccountSimulator(IAccount):
         current_price = position['current_price'][0]
         profit = position['profit'][0]
         type = position['type'][0]
-        #real_profit = volume*profit #NOTE: This was a bug - this was being performed in both and was being double counted
         returned_capital = self.calc_capital_gain_loss(type,volume,current_price,price,profit)
 
         row_index = self.positions_df.index[self.positions_df['ticket'] == ticket][0]
@@ -109,12 +113,10 @@ class AccountSimulator(IAccount):
             returned_capital = price*volume+real_profit
         return returned_capital
 
-    # Note on 1.21.24 that positions are actually returned from MT5 as named Tuples
     def get_positions(self) -> tuple:
         if(self.positions_df.empty):
             return 0
         else:
-            #self.positions = self.positions_df.to_dict(orient='index')
             self.positions = list(self.positions_df.itertuples(index=False, name="TradePosition"))
         return self.positions
     
@@ -130,8 +132,6 @@ class AccountSimulator(IAccount):
             current_price = self.symbol.get_symbol_info_ask()
         return current_price
     
-    # Option 1, use the current time as the trade time when running trade executor in mock
-    # Update on 1.21.24 - currently using system time to record trades but this doesn't match MT5 real output
     def get_date_time_now(self) -> datetime:
         offset = timedelta(hours=2.0)
         tz_UTC_offset = timezone(offset,'GMT')
@@ -140,18 +140,12 @@ class AccountSimulator(IAccount):
         dt_string = dt.strftime(format)
         return dt_string
     
-    # Option 2, use the symbol time as the trade time when running trade executor in mock
-    # Update on 1.21.24 - need to use symbol time to determine the trade time to mimick MT5
     def convert_epoch_time(self, time:int) -> datetime:
-        pass
+        dt_string = datetime.utcfromtimestamp(round(int(time))).strftime('%Y-%m-%d %H:%M:%S')
+        return dt_string
     
-    # Pass symbol at instantiation or via setter method ???
-    # Update on 1.21.24 - symbol is passed via dependency injection
-    def set_symbol(self, symbol: object) -> object:
-        self.symbol = symbol
-        return self.symbol
-
     def record_position(self, position_df, action_df) -> bool:
+        position_df['time'] = position_df['time'].apply(self.convert_epoch_time)
         self.action_writer.record_position(position_df, action_df)
         self.action_writer.write_position()
         return True

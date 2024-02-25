@@ -1,7 +1,7 @@
 import { mockAccount, mockClosedOrders, mockOpenorders } from "./mock";
 
 export async function getClosedOrders() {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.MODE === "development") {
     return mockClosedOrders;
   } else {
     try {
@@ -16,7 +16,7 @@ export async function getClosedOrders() {
 }
 
 export async function getAccount() {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.MODE === "development") {
     return mockAccount;
   } else {
     try {
@@ -31,7 +31,7 @@ export async function getAccount() {
 }
 
 export async function getOpenOrders() {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.MODE === "development") {
     return mockOpenorders;
   } else {
     try {

@@ -10,6 +10,7 @@ import { getAccount, getClosedOrders, getOpenOrders } from "./lib/action";
 import Account from "./components/account/account";
 
 export default function App() {
+  console.log(`Running  in ${import.meta.env.MODE}`);
   const [closedOrders, setClosedOrders] = useState<ClosedOrderType[]>([
     {
       comment: "?",

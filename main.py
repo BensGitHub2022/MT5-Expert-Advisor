@@ -1,13 +1,13 @@
 import pandas as pd
 
-from src.account_factory import AccountFactory
+from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
-from src.context_factory import ContextFactory
+from src.factories.context_factory import ContextFactory
 from src.ema_strategy import EmaStrategy
 from src.json_reader import JsonReader
-from src.symbol_factory import SymbolFactory
+from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
-from src.trade_executor_factory import TradeExecutionFactory
+from src.factories.trade_executor_factory import TradeExecutionFactory
 
 # Path to MetaTrader5 login details.
 ACCOUNT_SETTINGS_PATH = "pkg/settings.json"

@@ -4,7 +4,6 @@ import MetaTrader5 as mt5
 
 from src.shared_helper_functions import calc_lot_size
 
-#RISK = .02
 
 class TradeExecutorMT5():
 

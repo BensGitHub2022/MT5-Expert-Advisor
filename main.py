@@ -18,10 +18,10 @@ CREDENTIALS_FILE_PATH = "pkg/credentials.json"
 CANDLES_MOCK_LOCATION = "mock/SOLUSD_candlesticks_from_1704067500_to_1704585480.csv"
 TICKS_MOCK_LOCATION = "mock/SOLUSD_ticks_from_1704067500_to_1704585480.csv"
 
-EMA_SHORT = 2
-EMA_LONG = 3
+EMA_SHORT = 500
+EMA_LONG = 1000
 
-PRODUCTION = True # added for convenience, all factories eventually created in main and passed to trade_bot
+PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
     # Composition root

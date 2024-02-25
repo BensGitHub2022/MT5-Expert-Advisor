@@ -2,8 +2,6 @@ import pandas as pd
 
 from src.shared_helper_functions import calc_lot_size
 
-RISK = .02
-
 class TradeExecutorSimulator():
 
     current_risk_per_trade: float 

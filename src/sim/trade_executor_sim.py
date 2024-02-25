@@ -20,14 +20,25 @@ class TradeExecutorSimulator():
         volume = calc_lot_size(price, balance)
         type = signal['action_str']
         capital_committed = (-1)*(volume * price)
-        self.account_info.add_position(symbol,type,volume,price)
-        self.account_info.update_balance(capital_committed)
+        result_add_position = self.account_info.add_position(symbol,type,volume,price)
+        result_update_balance = self.account_info.update_balance(capital_committed)
+        print("result of order: ")
+        print("add position: {}, update balance: {}".format(result_add_position, result_update_balance))
+        print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal['action_str'], symbol,volume,price,deviation))
         return True
 
     def close_position(self, position, bid, ask, deviation) -> bool:
         ticket = position.ticket
         self.account_info.update_position(ticket)
-        self.account_info.remove_position(ticket)
+        result_remove_position = self.account_info.remove_position(ticket)
+        print("result of order: ")
+        print("closed position: {}, update balance: {}".format(result_remove_position, self.account_info.get_account_balance()))
+        print("1. order_send: {} position on {} {} lots closed at {} with deviation={} points".format(
+            "buy" if position.type == 1 else "sell", 
+            position.symbol, 
+            round(float(position.volume),2), 
+            round(float(ask),2) if position.type == 1 else round(float(bid),2),
+            deviation))
         return True
     
     def close_all_positions(self, bid, ask, deviation) -> bool:
@@ -36,5 +47,5 @@ class TradeExecutorSimulator():
             self.close_position(position, bid, ask, deviation)
 
     def do_nothing(self) -> None:
-        print("No actionable trades!")
+        #print("No actionable trades!")
         return

@@ -79,6 +79,8 @@ class TradeExecutorMT5():
 
         result = mt5.order_send(request)
 
+        print("result of close position: ")
+        print(result)
         print("1. order_send: {} position on {} {} lots closed at {} with deviation={} points".format(
             "buy" if position.type == 1 else "sell", 
             position.symbol, 

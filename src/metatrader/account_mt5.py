@@ -27,7 +27,10 @@ class AccountMT5(IAccount):
             raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
         return positions
 
-    # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame # 1.21.24 - positions are actually Tuples
+    # NOTE: The presentation of positions is much more human readable when you use the code below.
+    # In order to log the output of positions to a csv file it might be beneficial to uncomment this function and send it to action_writer
+    # Currently we only record positions when running in simulation mode
+    # Positions are readily available from MT5 terminal but it might be wise to keep our own record in a csv
     """
     def get_positions_df(self) -> pd.DataFrame:
         self.get_positions()

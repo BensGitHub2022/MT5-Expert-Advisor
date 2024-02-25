@@ -26,6 +26,7 @@ class SymbolSimulator(ISymbol):
 
     def __init__(self, symbol, timeframe, candles_mock_location="mock/candlesticks.csv", ticks_mock_location="mock/ticks.csv"):
         self.symbol = symbol # NOTE: Devise a way to set the symbol to match the mock location of a file
+        self.timeframe = timeframe
         
         self.ticks_df_master = self.get_ticks_from_csv(ticks_mock_location)
         self.candles_df_master = self.get_candlesticks_from_csv(candles_mock_location)
@@ -74,6 +75,9 @@ class SymbolSimulator(ISymbol):
 
     def get_symbol_name(self) -> str:
         return self.symbol
+    
+    def get_symbol_timeframe(self) -> str:
+        return self.timeframe
 
     # NOTE: ### Implementation unique to mock method ###
     # Get candlesticks master file

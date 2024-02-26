@@ -22,7 +22,6 @@
   volume: float
   profit: float
   symbol: string
-  comment: string
 }
 ```
 
@@ -38,7 +37,6 @@
     price_open: float
     price_current: float
     symbol: string
-    comment: string
 }
 ```
 

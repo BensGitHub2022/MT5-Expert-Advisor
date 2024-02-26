@@ -13,6 +13,14 @@ from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
 
+# NOTE: For websocket test
+from src.interfaces import IMessenger
+import threading
+import asyncio
+import websockets
+import websockets.sync
+import websockets.sync.server
+
 # Path to MetaTrader5 login details.
 ACCOUNT_SETTINGS_PATH = "config/settings.json"
 CREDENTIALS_FILE_PATH = "config/credentials.json"
@@ -22,7 +30,43 @@ EMA_LONG = 1000
 
 PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
+class Messenger(IMessenger):
+    sem = threading.Semaphore()
+    lock = threading.Lock()
+    queue = list()
+
+    def queue_message(self, message: str) -> None:
+        self.lock.acquire()
+        self.queue.append(message)
+        self.sem.release()
+        self.lock.release()
+
+    def get_message(self) -> str:
+        self.sem.acquire()
+        message = ""
+        self.lock.acquire()
+        if (self.queue != []):
+            message = self.queue.pop(0)
+        self.lock.release()
+        return message
+
+messenger = Messenger()
+
+def trade_bot_service(websocket):
+    while True:
+        message = messenger.get_message()
+        if (message != ""):
+            websocket.send(message)
+
+def server_thread_proc():
+    with websockets.sync.server.serve(trade_bot_service, "localhost", 5678) as server:
+        server.serve_forever()
+
+
 def main():
+    thread = threading.Thread(target=server_thread_proc)
+    thread.start()
+
     # NOTE: Args Key:
     # 1 - symbol name OR settings
     # 2 - Production flag, 1 == True, 0 == False
@@ -79,8 +123,8 @@ def main():
     trade_executor = trade_execution_factory.create_trade_executor(account)
     
     strategy = EmaStrategy(symbol,ema_short,ema_long, action_writer, console_output=production)
-
-    trade_bot = TradeBot(context, action_writer, strategy, symbol, account, trade_executor)
+    
+    trade_bot = TradeBot(messenger,context, action_writer, strategy, symbol, account, trade_executor)
     trade_bot.start()
     kill_bot = input()
     if (kill_bot == 'X'):

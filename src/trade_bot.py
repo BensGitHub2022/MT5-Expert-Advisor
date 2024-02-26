@@ -1,12 +1,15 @@
 import threading
 
 from src.action_writer import ActionWriter
-from src.interfaces import (IAccount, IContext, IStrategy, ISymbol,
+from src.interfaces import (IMessenger,IAccount, IContext, IStrategy, ISymbol,
                             ITradeExecutor)
 
 
 class TradeBot(object):
     
+    # NOTE: for websocket example implementation
+    messenger: IMessenger
+
     # instance variables (passed in the constructor)
     context: IContext
     strategy: IStrategy
@@ -19,7 +22,8 @@ class TradeBot(object):
     thread: threading.Thread
     cancelled: bool
 
-    def __init__(self, context: IContext, action_writer: ActionWriter,strategy: IStrategy, symbol: ISymbol, account: IAccount, trade_executor: ITradeExecutor):
+    def __init__(self, messenger: IMessenger, context: IContext, action_writer: ActionWriter,strategy: IStrategy, symbol: ISymbol, account: IAccount, trade_executor: ITradeExecutor):
+        self.messenger = messenger
         self.context = context
         self.action_writer = action_writer
         self.strategy = strategy
@@ -54,8 +58,13 @@ class TradeBot(object):
         self.strategy.process_seed()
 
         self.strategy.record_action()
-    
+
+        counter: int = 0
+
         while (not self.cancelled):
+            self.messenger.queue_message("Serving websocket ... " + str(counter))
+            counter += 1
+
             if(self.strategy.check_next()):
                 self.strategy.process_next()
                 signal = self.strategy.check_signal()

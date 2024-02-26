@@ -22,16 +22,16 @@ class AccountMT5(IAccount):
         profit = account_info_dict['profit']
         return profit
     
-    def get_positions(self) -> tuple: # Note on 1.21.24 that MT5 returns positions as a named Tuple
-        positions = mt5.positions_get()
-        if positions is None:
-            raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
-        return positions
+    def get_positions(self) -> dict: # Note on 1.21.24 that MT5 returns positions as a named Tuple
+        pos = mt5.positions_get()
+        return { "positions": pos }
     
     def get_deal_history(self) -> dict:
         start = datetime(2010, 1, 1)
         end = datetime.now()
-        return mt5.history_deals_get(start, end)._asdict()
+        deals = mt5.history_deals_get(start, end)
+        list = [deal._asdict() for deal in deals]
+        return { "history": list }
 
     # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame # 1.21.24 - positions are actually Tuples
     """

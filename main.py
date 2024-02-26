@@ -7,10 +7,8 @@ from src.ema_strategy import EmaStrategy
 from src.json_reader import JsonReader
 from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
+from api.web_service import WebService
 
-from api.api import WebService, Endpoint
-from api.handlers import get_open_orders, get_closed_orders
-import threading
 
 from src.factories.trade_executor_factory import TradeExecutionFactory
 
@@ -27,22 +25,7 @@ EMA_LONG = 250
 
 PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
-# SERVER SETUP
-def flask_init():
-    endpoints = []
-
-    endpoints.append(Endpoint("/orders-open", get_open_orders))
-    endpoints.append(Endpoint("/orders-closed", get_closed_orders))
-
-    ws = WebService(__name__, endpoints)
-    ws.run()
-
 def main():
-
-    # Avoid blocking main thread
-    flask_thread = threading.Thread(target=flask_init)
-    flask_thread.daemon = True
-    flask_thread.start()
 
     print("Hello Trade Bot!")
 
@@ -63,6 +46,10 @@ def main():
 
     account_factory = AccountFactory(production=PRODUCTION)
     account = account_factory.create_account(symbol, balance = 100000, profit = 0, action_writer=action_writer)
+
+    # FLASK. This runs on a seperate (daemon) thread
+    ws = WebService(__name__, account)
+    ws.run()
 
     trade_execution_factory = TradeExecutionFactory(production=PRODUCTION)
     trade_executor = trade_execution_factory.create_trade_executor(account)

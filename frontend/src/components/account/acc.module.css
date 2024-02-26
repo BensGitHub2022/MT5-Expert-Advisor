@@ -1,9 +1,0 @@
-.container {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  height: 4rem;
-  border-style: solid;
-  border-radius: 5px;
-  border-color: black;
-}

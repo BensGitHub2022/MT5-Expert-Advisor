@@ -23,8 +23,11 @@ class AccountMT5(IAccount):
         return profit
     
     def get_positions(self) -> dict: # Note on 1.21.24 that MT5 returns positions as a named Tuple
-        pos = mt5.positions_get()
-        return { "positions": pos }
+        try:
+            pos = mt5.positions_get()
+            return { "positions": pos }
+        except BaseException:
+            raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
     
     def get_deal_history(self) -> dict:
         start = datetime(2010, 1, 1)

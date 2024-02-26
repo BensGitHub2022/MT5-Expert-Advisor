@@ -100,23 +100,6 @@
 }
 ```
 ----
-### GET /orders-closed/:ticket
-  Returns the closed order with the given ticket number.
-* **URL Params**  
-  None
-* **Data Params**  
-  None
-* **Headers**  
-  Content-Type: application/json  
-* **Success Response:**  
-* **Code:** 200  
-  **Content:**  
-```
-{
-  order: <ClosedOrder_Object>
-}
-```
-----
 ### GET /account-info
   Returns account data for the currently-connected MT5 account.
 * **URL Params**  

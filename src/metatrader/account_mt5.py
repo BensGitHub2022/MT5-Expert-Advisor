@@ -30,11 +30,15 @@ class AccountMT5(IAccount):
             raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
     
     def get_deal_history(self) -> dict:
-        start = datetime(2010, 1, 1)
-        end = datetime.now()
-        deals = mt5.history_deals_get(start, end)
-        list = [deal._asdict() for deal in deals]
-        return { "history": list }
+        try:
+            start = datetime(2010, 1, 1)
+            end = datetime.now()
+            deals = mt5.history_deals_get(start, end)
+            list = [deal._asdict() for deal in deals]
+            return { "history": list }
+        except BaseException:
+            raise RuntimeError('No historical positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
+
 
     # Unsure if this is necessary - easier to work with positions as a dict rather than a DataFrame # 1.21.24 - positions are actually Tuples
     """

@@ -2,6 +2,8 @@
 import warnings # Bad
 from pandas.errors import SettingWithCopyWarning # Bad
 
+import sys
+
 from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
 from src.factories.context_factory import ContextFactory
@@ -12,11 +14,8 @@ from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
 
 # Path to MetaTrader5 login details.
-ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
-CREDENTIALS_FILE_PATH = "pkg/credentials.json"
-
-CANDLES_MOCK_LOCATION = "mock/SOLUSD_candlesticks_from_1704067500_to_1704585480.csv"
-TICKS_MOCK_LOCATION = "mock/SOLUSD_ticks_from_1704067500_to_1704585480.csv"
+ACCOUNT_SETTINGS_PATH = "config/settings.json"
+CREDENTIALS_FILE_PATH = "config/credentials.json"
 
 EMA_SHORT = 500
 EMA_LONG = 1000
@@ -24,6 +23,23 @@ EMA_LONG = 1000
 PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
+    # NOTE: Args Key:
+    # 1 - symbol name OR settings
+    # 2 - Production flag, 1 == True, 0 == False
+    # 3 - EMA short
+    # 4 - EMA long
+    # Example: BTCUSD 1 500 1000
+    try:
+        filepath: str = "config/" + sys.argv[1] + ".json"
+        production: int = int(sys.argv[2])
+        ema_short: int = int(sys.argv[3])
+        ema_long: int = int(sys.argv[4])
+    except:
+        filepath: str = ACCOUNT_SETTINGS_PATH
+        production: bool = PRODUCTION
+        ema_short = EMA_SHORT
+        ema_long = EMA_LONG
+    
     # Composition root
     print("Hello Trade Bot!")
     
@@ -36,28 +52,35 @@ def main():
     # with pd.option_context('mode.chained_assignment', None):
     # ^ needs to implemented in method of calling function
 
-    json_settings = JsonReader(ACCOUNT_SETTINGS_PATH)
-    credentials = JsonReader(CREDENTIALS_FILE_PATH)
-    action_writer = ActionWriter()
+    json_settings = JsonReader(file_path=filepath)
+    credentials = JsonReader(file_path=CREDENTIALS_FILE_PATH)
+    
     symbol = json_settings.get_symbol()
     timeframe = json_settings.get_timeframe()
-    # NOTE: These could all potentially be folded into context class
+    if (production == False):
+        candlesticks_filepath = json_settings.get_symbol_candlesticks_filepath()
+        ticks_filepath = json_settings.get_symbol_ticks_filepath()
+    else:
+        candlesticks_filepath = ""
+        ticks_filepath = ""
 
-    context_factory = ContextFactory(production=PRODUCTION)
+    action_writer = ActionWriter()
+
+    context_factory = ContextFactory(production=production)
     context = context_factory.create_context(credentials.get_json_data())
     
-    symbol_factory = SymbolFactory(production=PRODUCTION)
-    symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=CANDLES_MOCK_LOCATION, ticks_mock_location=TICKS_MOCK_LOCATION)
+    symbol_factory = SymbolFactory(production=production)
+    symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=candlesticks_filepath, ticks_mock_location=ticks_filepath)
 
-    account_factory = AccountFactory(production=PRODUCTION)
+    account_factory = AccountFactory(production=production)
     account = account_factory.create_account(symbol, balance = 100000, profit = 0, action_writer=action_writer)
 
-    trade_execution_factory = TradeExecutionFactory(production=PRODUCTION)
+    trade_execution_factory = TradeExecutionFactory(production=production)
     trade_executor = trade_execution_factory.create_trade_executor(account)
     
-    strategy = EmaStrategy(symbol,EMA_SHORT,EMA_LONG, action_writer, console_output=PRODUCTION)
+    strategy = EmaStrategy(symbol,ema_short,ema_long, action_writer, console_output=production)
 
-    trade_bot = TradeBot(context,action_writer, strategy, symbol, account, trade_executor)
+    trade_bot = TradeBot(context, action_writer, strategy, symbol, account, trade_executor)
     trade_bot.start()
     kill_bot = input()
     if (kill_bot == 'X'):

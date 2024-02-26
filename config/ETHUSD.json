@@ -1,6 +1,6 @@
 {
     "mt5": {
-        "symbols": ["SOLUSD"],
+        "symbol": "ETHUSD",
         "timeframe": "one_minute"
     }
 }

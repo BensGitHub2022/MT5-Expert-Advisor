@@ -1,0 +1,6 @@
+{
+    "mt5": {
+        "symbol": "BTCUSD",
+        "timeframe": "one_minute"
+    }
+}

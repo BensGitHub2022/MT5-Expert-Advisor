@@ -53,9 +53,15 @@ def main():
     strategy = EmaStrategy(symbol,config.ema_short,config.ema_long, action_writer, console_output=config.production)
 
     trade_bot = TradeBot(context, action_writer, strategy, symbol, account, trade_executor)
+    
     trade_bot.start()
-    kill_bot = input()
-    if (kill_bot == 'X'):
+    
+    try:
+        while(not trade_bot.cancelled):
+            kill_bot = input()
+            print(kill_bot + " is not a recognized command!")
+    except KeyboardInterrupt:
+        trade_bot.cancelled = True
         trade_bot.stop()
 
 if __name__ == '__main__':

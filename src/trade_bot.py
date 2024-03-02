@@ -32,9 +32,9 @@ class TradeBot(object):
 
     def start(self):
         print("Trade Bot started execution!")
-        print("Press X to stop")
+        print("Press 'ctrl + C' to stop")
         self.thread.start()
-
+        
     def stop(self):
         print("Trade Bot stopped execution!")
         self.cancelled = True
@@ -54,7 +54,7 @@ class TradeBot(object):
         self.strategy.process_seed()
 
         self.strategy.record_action()
-    
+
         while (not self.cancelled):
             if(self.strategy.check_next()):
                 self.strategy.process_next()
@@ -76,5 +76,6 @@ class TradeBot(object):
 
         return
 
+# Globally declared function
 def trade_bot_thread_func(inst: TradeBot):
     inst.thread_func()

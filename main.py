@@ -8,7 +8,6 @@ from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
 from src.factories.context_factory import ContextFactory
 from src.ema_strategy import EmaStrategy
-from src.json_reader import JsonReader
 from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
@@ -45,10 +44,10 @@ def main():
     symbol = symbol_factory.create_symbol(config.symbol, config.timeframe, candles_mock_location=config.candlesticks_filepath, ticks_mock_location=config.ticks_filepath)
 
     account_factory = AccountFactory(production=config.production)
-    account = account_factory.create_account(symbol, balance = 100000, profit = 0, action_writer=action_writer)
+    account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
 
     trade_execution_factory = TradeExecutionFactory(production=config.production)
-    trade_executor = trade_execution_factory.create_trade_executor(account)
+    trade_executor = trade_execution_factory.create_trade_executor(account, symbol)
     
     strategy = EmaStrategy(symbol,config.ema_short,config.ema_long, action_writer, console_output=config.production)
 

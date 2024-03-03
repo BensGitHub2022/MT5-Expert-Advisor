@@ -62,23 +62,6 @@
 }
 ```
 ----
-### GET /orders-open/:ticket
-  Returns the open order with the given ticket number.
-* **URL Params**  
-  None
-* **Data Params**  
-  None
-* **Headers**  
-  Content-Type: application/json  
-* **Success Response:**  
-* **Code:** 200  
-  **Content:**  
-```
-{
-  order: <OpenOrder_Object>
-}
-```
-----
 ### GET /orders-closed
   Returns all historical orders.
 * **URL Params**  

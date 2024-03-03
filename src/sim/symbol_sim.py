@@ -19,26 +19,19 @@ class SymbolSimulator(ISymbol):
     candles_df: pd.DataFrame
 
     symbol: str 
-    mt5_timeframe: int # do we use this in mock ?
-    timeframe: str # do we use this in mock ?
-    start_pos: int # how do we use start pos in mock?
+    timeframe: str 
+    start_pos: int
 
-    current_time: timezone # do we use this in mock ?
+    current_time: int # NOTE: the only use for this is to obtain ticks based on current candlestick time but get_ticks method hasn't been defined yet. 
 
     def __init__(self, symbol, timeframe, candles_mock_location="mock/candlesticks.csv", ticks_mock_location="mock/ticks.csv"):
-        self.symbol = symbol
+        self.symbol = symbol # NOTE: Devise a way to set the symbol to match the mock location of a file
         self.timeframe = timeframe
-        self.mt5_timeframe = self.get_mt5_timeframe(timeframe) # do we need this?
-        self.start_pos = 0 # how do we use start pos in mock? # counter unique to mock 
         
         self.ticks_df_master = self.get_ticks_from_csv(ticks_mock_location)
         self.candles_df_master = self.get_candlesticks_from_csv(candles_mock_location)
         self.counter = Counter(self.candles_df_master)
-
-    def set_symbol(self, symbol: str, timeframe: str) -> None:
-        self.symbol = symbol
-        self.timeframe = timeframe # do we use this in mock?
-        
+    
     def get_candlesticks(self, num_candlesticks) -> pd.DataFrame:
         interval = self.counter.__iter__()+num_candlesticks
         if (self.counter.check_index(interval)):
@@ -82,14 +75,17 @@ class SymbolSimulator(ISymbol):
 
     def get_symbol_name(self) -> str:
         return self.symbol
+    
+    def get_symbol_timeframe(self) -> str:
+        return self.timeframe
 
-    ### Implementation unique to mock method ###
+    # NOTE: ### Implementation unique to mock method ###
     # Get candlesticks master file
     def get_candlesticks_from_csv(self, candles_mock_location) -> pd.DataFrame:
         """
         Retrieves mock data from csv file in mock directory.
         :param candles_mock_location: The path to the mock data which is stored in candlesticks (bar chart format) as a csv
-        :return: The master dataframe with ALL mock data to be tested.
+        :return: The candlesticks master dataframe with ALL mock data to be tested.
         """
         candles_df_master = pd.read_csv(candles_mock_location,index_col=0)
         return candles_df_master
@@ -97,65 +93,14 @@ class SymbolSimulator(ISymbol):
     # Get ticks master file
     def get_ticks_from_csv(self, ticks_mock_location) -> pd.DataFrame:
         """
-        
+        Retrieves mock data from csv file in mock directory.
+        :param ticks_mock_location: The path to the mock data which is stored in ticks (price movement) as a csv
+        :return: The ticks master dataframe with ALL mock data to be tested.
         """
         ticks_df_master = pd.read_csv(ticks_mock_location, index_col=0)
         return ticks_df_master
-    
-    # change which mock candlesticks file is used
-    def set_candles_df_master(self, candles_mock_location) -> pd.DataFrame:
-        df = self.get_candlesticks_from_csv(candles_mock_location)
-        self.candles_df_master = df
-        return self.candles_df_master
 
-    # change which mock ticks file is used
-    def set_ticks_df_master(self, ticks_mock_location) -> pd.DataFrame:
-        df = self.get_ticks_from_csv(ticks_mock_location)
-        self.ticks_df_master = df
-        return self.ticks_df_master
-
-    # unused
-    def get_mt5_timeframe(self, timeframe: str):
-            """
-            Gets a MetaTrader 5 readable timeframe.
-            :param timeframe: The to-be located timeframe as a string.
-            :return: A MetaTrader 5 timeframe.
-            """
-            try:
-                return Timeframe[timeframe].value
-            except KeyError as e:
-                print(f"{timeframe} is not a legal timeframe. {e}")
-                raise e
-            
-    # unused
-    def set_candlesticks_start_pos(self, start_pos=0) -> None:
-        self.start_pos = start_pos # how do we use start pos in mock?
-        self.counter.__setindex__(start_pos) # counter unique to mock
-
-    # set ticks date method is open for implementation in mock
-
-# unused
-class Timeframe(Enum):
-    one_minute = 60
-    two_minutes = 120
-    three_minutes = 180
-    four_minutes = 240
-    five_minutes = 300
-    six_minutes = 360
-    ten_minutes = 600
-    twelve_minutes = 720
-    fifteen_minutes = 900
-    twenty_minutes = 1200
-    thirty_minutes = 1800
-    one_month = 2628000
-    one_hour = 3600
-    two_hours = 7200
-    three_hours = 10800
-    four_hours = 14400
-    six_hours = 21600
-    eight_hours = 28800
-    one_day = 86400
-
+# Advances through candlesticks stored in data frame from csv file
 class Counter():
     current_index: int
     dataframe_size: int

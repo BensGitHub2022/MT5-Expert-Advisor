@@ -1,4 +1,6 @@
-import pandas as pd
+# import pandas as pd # Not used in main unless for debugging
+import warnings # Bad
+from pandas.errors import SettingWithCopyWarning # Bad
 
 from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
@@ -17,26 +19,33 @@ from src.factories.trade_executor_factory import TradeExecutionFactory
 ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
 CREDENTIALS_FILE_PATH = "pkg/credentials.json"
 
-CANDLES_MOCK_LOCATION = "mock/SOLUSD_candlesticks_from_1672531500_to_1704067080.csv"
-TICKS_MOCK_LOCATION = "mock/SOLUSD_ticks_from_1672531500_to_1704067080.csv"
+CANDLES_MOCK_LOCATION = "mock/SOLUSD_candlesticks_from_1704067500_to_1704585480.csv"
+TICKS_MOCK_LOCATION = "mock/SOLUSD_ticks_from_1704067500_to_1704585480.csv"
 
-EMA_SHORT = 50
-EMA_LONG = 250
+EMA_SHORT = 500
+EMA_LONG = 1000
 
 PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
-
-    print("Hello Trade Bot!")
-
     # Composition root
-    pd.set_option('display.max_columns', None)
+    print("Hello Trade Bot!")
+    
+    # NOTE: Need to decide if these present true issues.
+    warnings.simplefilter(action='ignore', category=FutureWarning) # Bad <- this one relates to passing NaN to pd.concat, will be depricated in future
+    warnings.simplefilter(action='ignore', category=SettingWithCopyWarning) # Bad <- this one relates to copy of a slice of a dataframe
+    # OR
+    # pd.set_option('mode.chained_assignment', None)
+    # OR
+    # with pd.option_context('mode.chained_assignment', None):
+    # ^ needs to implemented in method of calling function
 
     json_settings = JsonReader(ACCOUNT_SETTINGS_PATH)
     credentials = JsonReader(CREDENTIALS_FILE_PATH)
     action_writer = ActionWriter()
     symbol = json_settings.get_symbol()
     timeframe = json_settings.get_timeframe()
+    # NOTE: These could all potentially be folded into context class
 
     context_factory = ContextFactory(production=PRODUCTION)
     context = context_factory.create_context(credentials.get_json_data())
@@ -54,7 +63,7 @@ def main():
     trade_execution_factory = TradeExecutionFactory(production=PRODUCTION)
     trade_executor = trade_execution_factory.create_trade_executor(account)
     
-    strategy = EmaStrategy(symbol,EMA_SHORT,EMA_LONG, action_writer)
+    strategy = EmaStrategy(symbol,EMA_SHORT,EMA_LONG, action_writer, console_output=PRODUCTION)
 
     trade_bot = TradeBot(context,action_writer, strategy, symbol, account, trade_executor)
     trade_bot.start()

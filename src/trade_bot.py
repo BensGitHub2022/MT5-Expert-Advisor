@@ -36,9 +36,9 @@ class TradeBot(object):
 
     def start(self):
         print("Trade Bot started execution!")
-        print("Press X to stop")
+        print("Press 'ctrl + C' to stop")
         self.thread.start()
-
+        
     def stop(self):
         print("Trade Bot stopped execution!")
         self.cancelled = True
@@ -72,12 +72,12 @@ class TradeBot(object):
                 match signal.get('action'):
                     case 1:
                         if(self.account.get_positions()):
-                            self.trade_executor.close_all_positions(self.symbol.get_symbol_info_bid(), self.symbol.get_symbol_info_ask(),20)
-                        self.trade_executor.place_order(self.symbol.get_symbol_name(),signal,self.symbol.get_symbol_info_ask(),20) 
+                            self.trade_executor.close_all_positions(20)
+                        self.trade_executor.place_order(signal,20) 
                     case -1:
                         if(self.account.get_positions()):
-                            self.trade_executor.close_all_positions(self.symbol.get_symbol_info_bid(), self.symbol.get_symbol_info_ask(),20)
-                        self.trade_executor.place_order(self.symbol.get_symbol_name(),signal,self.symbol.get_symbol_info_bid(),20) 
+                            self.trade_executor.close_all_positions(20)
+                        self.trade_executor.place_order(signal,20) 
                     case 0:
                         self.trade_executor.do_nothing()
                 
@@ -85,5 +85,6 @@ class TradeBot(object):
 
         return
 
+# Globally declared function
 def trade_bot_thread_func(inst: TradeBot):
     inst.thread_func()

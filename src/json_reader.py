@@ -42,3 +42,6 @@ class JsonReader(object):
     def get_symbol_ticks_filepath(self) -> str:
         return self.json_data["mt5"]["ticks"]
     
+    def get_credentials(self) -> dict:
+        return self.json_data["mt5"]
+    

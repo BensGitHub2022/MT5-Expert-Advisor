@@ -8,10 +8,10 @@ from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
 from src.factories.context_factory import ContextFactory
 from src.ema_strategy import EmaStrategy
-from src.json_reader import JsonReader
 from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
+from src.config import Config
 
 # NOTE: For websocket test
 from src.interfaces import IMessenger
@@ -21,14 +21,6 @@ import websockets
 import websockets.sync
 import websockets.sync.server
 
-# Path to MetaTrader5 login details.
-ACCOUNT_SETTINGS_PATH = "config/settings.json"
-CREDENTIALS_FILE_PATH = "config/credentials.json"
-
-EMA_SHORT = 500
-EMA_LONG = 1000
-
-PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
 
 class Messenger(IMessenger):
     sem = threading.Semaphore()
@@ -73,21 +65,10 @@ def main():
     # 3 - EMA short
     # 4 - EMA long
     # Example: BTCUSD 1 500 1000
-    try:
-        filepath: str = "config/" + sys.argv[1] + ".json"
-        production: int = int(sys.argv[2])
-        ema_short: int = int(sys.argv[3])
-        ema_long: int = int(sys.argv[4])
-    except:
-        filepath: str = ACCOUNT_SETTINGS_PATH
-        production: bool = PRODUCTION
-        ema_short = EMA_SHORT
-        ema_long = EMA_LONG
+    args = sys.argv[1:]
+    config = Config(args)
     
-    # Composition root
-    print("Hello Trade Bot!")
-    
-    # NOTE: Need to decide if these present true issues.
+    # NOTE: (Supress warnings) Need to decide if these present true issues.
     warnings.simplefilter(action='ignore', category=FutureWarning) # Bad <- this one relates to passing NaN to pd.concat, will be depricated in future
     warnings.simplefilter(action='ignore', category=SettingWithCopyWarning) # Bad <- this one relates to copy of a slice of a dataframe
     # OR
@@ -96,39 +77,37 @@ def main():
     # with pd.option_context('mode.chained_assignment', None):
     # ^ needs to implemented in method of calling function
 
-    json_settings = JsonReader(file_path=filepath)
-    credentials = JsonReader(file_path=CREDENTIALS_FILE_PATH)
-    
-    symbol = json_settings.get_symbol()
-    timeframe = json_settings.get_timeframe()
-    if (production == False):
-        candlesticks_filepath = json_settings.get_symbol_candlesticks_filepath()
-        ticks_filepath = json_settings.get_symbol_ticks_filepath()
-    else:
-        candlesticks_filepath = ""
-        ticks_filepath = ""
+    # Composition root
+    print("Hello Trade Bot!")
 
     action_writer = ActionWriter()
 
-    context_factory = ContextFactory(production=production)
-    context = context_factory.create_context(credentials.get_json_data())
+    context_factory = ContextFactory(production=config.production)
+    context = context_factory.create_context(config.credentials)
     
-    symbol_factory = SymbolFactory(production=production)
-    symbol = symbol_factory.create_symbol(symbol, timeframe, candles_mock_location=candlesticks_filepath, ticks_mock_location=ticks_filepath)
+    symbol_factory = SymbolFactory(production=config.production)
+    symbol = symbol_factory.create_symbol(config.symbol, config.timeframe, candles_mock_location=config.candlesticks_filepath, ticks_mock_location=config.ticks_filepath)
 
-    account_factory = AccountFactory(production=production)
-    account = account_factory.create_account(symbol, balance = 100000, profit = 0, action_writer=action_writer)
+    account_factory = AccountFactory(production=config.production)
+    account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
 
-    trade_execution_factory = TradeExecutionFactory(production=production)
-    trade_executor = trade_execution_factory.create_trade_executor(account)
+    trade_execution_factory = TradeExecutionFactory(production=config.production)
+    trade_executor = trade_execution_factory.create_trade_executor(account, symbol)
     
-    strategy = EmaStrategy(symbol,ema_short,ema_long, action_writer, console_output=production)
+    strategy = EmaStrategy(symbol,config.ema_short,config.ema_long, action_writer, console_output=config.production)
+
+    trade_bot = TradeBot(messenger, context, action_writer, strategy, symbol, account, trade_executor)
     
-    trade_bot = TradeBot(messenger,context, action_writer, strategy, symbol, account, trade_executor)
     trade_bot.start()
-    kill_bot = input()
-    if (kill_bot == 'X'):
+    
+    try:
+        while(not trade_bot.cancelled):
+            kill_bot = input()
+            print(kill_bot + " is not a recognized command!")
+    except KeyboardInterrupt:
+        trade_bot.cancelled = True
         trade_bot.stop()
+        thread.join()
 
 if __name__ == '__main__':
     main()

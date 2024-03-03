@@ -31,12 +31,13 @@ class TradeBot(object):
         self.account = account
         self.trade_executor = trade_executor
 
-        self.thread = threading.Thread(target=trade_bot_thread_func, args=(self,))
+        self.thread = threading.Thread(target=self.thread_func)
         self.cancelled = False
 
     def start(self):
         print("Trade Bot started execution!")
         print("Press 'ctrl + C' to stop")
+        self.messenger.start()
         self.thread.start()
         
     def stop(self):
@@ -62,8 +63,6 @@ class TradeBot(object):
         counter: int = 0
 
         while (not self.cancelled):
-            self.messenger.queue_message("Serving websocket ... " + str(counter))
-            counter += 1
 
             if(self.strategy.check_next()):
                 self.strategy.process_next()
@@ -71,10 +70,14 @@ class TradeBot(object):
                 
                 match signal.get('action'):
                     case 1:
+                        self.messenger.queue_message("Serving websocket ... " + str(counter))
+                        counter += 1
                         if(self.account.get_positions()):
                             self.trade_executor.close_all_positions(20)
                         self.trade_executor.place_order(signal,20) 
                     case -1:
+                        self.messenger.queue_message("Serving websocket ... " + str(counter))
+                        counter += 1
                         if(self.account.get_positions()):
                             self.trade_executor.close_all_positions(20)
                         self.trade_executor.place_order(signal,20) 
@@ -82,9 +85,4 @@ class TradeBot(object):
                         self.trade_executor.do_nothing()
                 
                 self.strategy.record_action()
-
         return
-
-# Globally declared function
-def trade_bot_thread_func(inst: TradeBot):
-    inst.thread_func()

@@ -2,6 +2,7 @@
 import warnings # Bad
 from pandas.errors import SettingWithCopyWarning # Bad
 
+import socketserver
 import sys
 
 from src.factories.account_factory import AccountFactory
@@ -12,53 +13,28 @@ from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
 from src.config import Config
+from src.messenger import Messenger
 
-# NOTE: For websocket test
-from src.interfaces import IMessenger
-import threading
-import asyncio
-import websockets
-import websockets.sync
-import websockets.sync.server
+HOST, PORT = "localhost", 5678
 
+class MyTCPHandler(socketserver.BaseRequestHandler):
+    """
+    The request handler class for our server.
 
-class Messenger(IMessenger):
-    sem = threading.Semaphore()
-    lock = threading.Lock()
-    queue = list()
+    It is instantiated once per connection to the server, and must
+    override the handle() method to implement communication to the
+    client.
+    """
 
-    def queue_message(self, message: str) -> None:
-        self.lock.acquire()
-        self.queue.append(message)
-        self.sem.release()
-        self.lock.release()
-
-    def get_message(self) -> str:
-        self.sem.acquire()
-        message = ""
-        self.lock.acquire()
-        if (self.queue != []):
-            message = self.queue.pop(0)
-        self.lock.release()
-        return message
-
-messenger = Messenger()
-
-def trade_bot_service(websocket):
-    while True:
-        message = messenger.get_message()
-        if (message != ""):
-            websocket.send(message)
-
-def server_thread_proc():
-    with websockets.sync.server.serve(trade_bot_service, "localhost", 5678) as server:
-        server.serve_forever()
-
+    def handle(self):
+        # self.request is the TCP socket connected to the client
+        self.data = self.request.recv(1024).strip()
+        print("Received from {}:".format(self.client_address[0]))
+        print(self.data)
+        # just send back the same data, but upper-cased
+        self.request.sendall(self.data)
 
 def main():
-    thread = threading.Thread(target=server_thread_proc)
-    thread.start()
-
     # NOTE: Args Key:
     # 1 - symbol name OR settings
     # 2 - Production flag, 1 == True, 0 == False
@@ -81,6 +57,7 @@ def main():
     print("Hello Trade Bot!")
 
     action_writer = ActionWriter()
+    messenger = Messenger()
 
     context_factory = ContextFactory(production=config.production)
     context = context_factory.create_context(config.credentials)
@@ -100,6 +77,8 @@ def main():
     
     trade_bot.start()
     
+    server = socketserver.BaseServer((HOST,PORT), MyTCPHandler)
+
     try:
         while(not trade_bot.cancelled):
             kill_bot = input()
@@ -107,7 +86,10 @@ def main():
     except KeyboardInterrupt:
         trade_bot.cancelled = True
         trade_bot.stop()
-        thread.join()
+        messenger.stop()
+        server.shutdown()
+        server.server_close()
 
 if __name__ == '__main__':
     main()
+

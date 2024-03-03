@@ -21,7 +21,7 @@ TICKS_MOCK_LOCATION = "mock/SOLUSD_ticks_from_1704067500_to_1704585480.csv"
 EMA_SHORT = 500
 EMA_LONG = 1000
 
-PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
+PRODUCTION = True # added for convenience, all factories eventually created in main and passed to trade_bot
 
 def main():
     # Composition root

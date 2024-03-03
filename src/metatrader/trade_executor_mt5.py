@@ -3,6 +3,7 @@ from enum import Enum
 import MetaTrader5 as mt5
 
 from src.shared_helper_functions import calc_lot_size
+from src.signal import Signal
 
 
 class TradeExecutorMT5():
@@ -16,7 +17,7 @@ class TradeExecutorMT5():
         self.current_lot_size = 0.0
         self.account_info = account
     
-    def place_order(self, symbol, signal, price, deviation) -> bool:
+    def place_order(self, symbol, signal: Signal, price, deviation) -> bool:
 
         volume = calc_lot_size(price, self.account_info.get_account_balance())
 
@@ -24,7 +25,7 @@ class TradeExecutorMT5():
             "action": TradeAction['market_order'].value,
             "symbol": symbol,
             "volume": round(float(volume), 2),
-            "type": OrderType[signal['action_str']].value,
+            "type": OrderType[signal.signal_type.value].value,
             "price": round(float(price), 2),
             "deviation": deviation,
             "magic": 100,

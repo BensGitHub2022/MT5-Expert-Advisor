@@ -7,6 +7,8 @@ import talib as ta
 
 from src.action_writer import ActionWriter
 from src.interfaces import IStrategy, ISymbol
+from src.signal import Signal
+from src.signal_type import SignalType
 
 SMOOTHENING = 2
 
@@ -145,7 +147,7 @@ class EmaStrategy(IStrategy):
         self.action_df = pd.concat([self.action_df,new_df], ignore_index=True)
         return True
 
-    def check_signal(self) -> dict:        
+    def check_signal(self) -> Signal:        
         ema_short = self.action_df['EMA_short']
         ema_long = self.action_df['EMA_long']
 
@@ -154,24 +156,15 @@ class EmaStrategy(IStrategy):
 
         #buy if short ema crosses above long ema
         if (ema_short.iloc[-2] < ema_long.iloc[-2]) and (ema_short.iloc[-1] > ema_long.iloc[-1]):
-            self.action_str = "buy"
-            self.action = 1
-            self.signal = {'action': self.action, 'action_str': self.action_str}
             #winsound.Beep(self.frequency, self.duration)
+            return Signal(SignalType.BUY)
 
         #sell if short ema crosses below long ema
         if (ema_short.iloc[-2] > ema_long.iloc[-2]) and (ema_short.iloc[-1] < ema_long.iloc[-1]):
-            self.action_str = "sell"
-            self.action = -1
-            self.signal = {'action': self.action, 'action_str': self.action_str}
             #winsound.Beep(self.frequency, self.duration)
-        
-        self.action_df.loc[self.ema_long,'action'] = self.action
-        self.action_df.loc[self.ema_long,'action_str'] = self.action_str
-        self.signal = {'action': self.action, 'action_str': self.action_str}
+            return Signal(SignalType.SELL)
 
-        # NOTE: Use signals class to replace signal dict
-        return self.signal
+        return Signal(SignalType.SKIP)
     
     def record_action(self) -> bool:
         if(not self.initialized):

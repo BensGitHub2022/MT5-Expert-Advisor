@@ -150,80 +150,8 @@ class AccountSimulator(IAccount):
         self.action_writer.write_position()
         return True
 
-
-    # See https://www.mql5.com/en/docs/python_metatrader5/mt5accountinfo_py for more info
-    def get_account_info(self) -> dict:
-        return {
-            "login": 25115284,
-            "trade_mode": 0,
-            "leverage": 100,
-            "limit_orders": 200,
-            "margin_so_mode": 0,
-            "trade_allowed": True,
-            "trade_expert": True,
-            "margin_mode": 2,
-            "currency_digits": 2,
-            "fifo_close": False,
-            "balance": 99553.22,
-            "credit": 0.0,
-            "profit": 41.82,
-            "equity": 99553.22,
-            "margin": 99.18,
-            "margin_free": 99455.04,
-            "margin_level": 101398.67590140559,
-            "margin_so_call": 50.0,
-            "margin_so_so": 30.0,
-            "margin_initial": 0.0,
-            "margin_maintenance": 0.0,
-            "assets": 0.0,
-            "liabilities": 0.0,
-            "commission_blocked": 0.0,
-            "server": "MetaQuotes-Demo",
-            "currency": "USD",
-            "company": "MetaQuotes Software Corp."
-        }
+    def get_account_info(self):
+        return NotImplementedError()
     
-    # See https://www.mql5.com/en/docs/python_metatrader5/mt5historydealsget_py for more info
-    def get_deal_history(self) -> dict:
-        return {
-            [
-                {
-                    "ticket": 523458345,
-                    "order": 12345545,
-                    "time": "12:35:35",
-                    "time_msc": 1582202125419,
-                    "type": 2,
-                    "entry": 0,
-                    "magic": 0,
-                    "position_id": 0,
-                    "reason": 0,
-                    "volume": 0.0,
-                    "price": 0.0000,
-                    "commission": 0.0,
-                    "swap": 0.0,
-                    "profit": 345.02,
-                    "fee": 0.0,
-                    "symbol": "USDCHF",
-                    "comment": "sample",
-                },
-                {
-                    "ticket": 523458346,
-                    "order": 12345546,
-                    "time": "16:35:35",
-                    "time_msc": 1582202125459,
-                    "type": 2,
-                    "entry": 0,
-                    "magic": 0,
-                    "position_id": 0,
-                    "reason": 0,
-                    "volume": 0.0,
-                    "price": 0.0000,
-                    "commission": 0.0,
-                    "swap": 0.0,
-                    "profit": 15.02,
-                    "fee": 0.0,
-                    "symbol": "BTCUSD",
-                    "comment": "sample",
-                },
-            ]
-        }
+    def get_deal_history(self):
+        return NotImplementedError()

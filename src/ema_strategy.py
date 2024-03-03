@@ -41,6 +41,9 @@ class EmaStrategy(IStrategy):
     frequency: int
     duration: int
 
+    #NOTE: Flag for producing messages "...sleeping" / "New candle!"
+    console_output: bool
+
     # NOTE: Synchronicity needs to be addressed in a later PR
     # This is not used or relied upon but can be called to ensure that the candlesticks & ticks are relatively close to the system time. 
     # Ensure that the data we are fetching does not have too much delay from local time
@@ -49,7 +52,7 @@ class EmaStrategy(IStrategy):
     # This is relied upon and essential to the strategy
     current_candlestick_time: int # Current candlestick time pulled from the most recent candlestick
 
-    def __init__(self, symbol: ISymbol, ema_short:int, ema_long:int, action_writer: object) -> None:
+    def __init__(self, symbol: ISymbol, ema_short:int, ema_long:int, action_writer: object, console_output: bool) -> None:
         """
         Constructor for EmaStrategy
         :param symbol: the symbol which is the focus of the ema strategy, passed as dependency injected object
@@ -76,7 +79,9 @@ class EmaStrategy(IStrategy):
         
         #NOTE For Winsound
         self.frequency = 500
-        self.duration = 250 
+        self.duration = 250
+
+        self.console_output = console_output
         
     def process_seed(self) -> bool:
         """
@@ -110,10 +115,16 @@ class EmaStrategy(IStrategy):
         current_candlestick_time = self.symbol.get_candlestick_time()
         if (current_candlestick_time != self.current_candlestick_time):
             self.current_candlestick_time = current_candlestick_time
-            print("New candle!")
+            if(self.console_output):
+                print("New candle!")
             return True
         else:
-            print("... sleeping")
+            if(self.console_output):
+                print("... sleeping")
+            # NOTE: The strategy class controls sleep time intervals right now which is a problem.
+            # This needs to be syncronized with MetaTrader server time as closely as possible.
+            # Right now, if we increase the sleep window then the trader will only check for candles on longer intervals which is bad for the strategy
+            # because it needs to identify entry and exit points as closely as possible to when an actionable trade is found from an incoming candle.
             time.sleep(1)
             return False
 
@@ -159,7 +170,8 @@ class EmaStrategy(IStrategy):
         self.action_df.loc[self.ema_long,'action_str'] = self.action_str
         self.signal = {'action': self.action, 'action_str': self.action_str}
 
-        return self.signal # Use tuple instead of dict here? Seems more appropriate
+        # NOTE: Use signals class to replace signal dict
+        return self.signal
     
     def record_action(self) -> bool:
         if(not self.initialized):

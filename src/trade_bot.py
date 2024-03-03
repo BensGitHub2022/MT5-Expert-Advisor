@@ -46,14 +46,14 @@ class TradeBot(object):
         if (not connected):
             return
 
-        print("Using the " + self.strategy.get_strategy_name() + ", trading on " + self.symbol.get_symbol_name())
-        print(self.account.get_positions())
+        print("Using the " + self.strategy.get_strategy_name() + ", trading on " + self.symbol.get_symbol_name() + ", at " + self.symbol.get_symbol_timeframe() + ", with fast EMA: " + str(self.strategy.get_ema_short()) + " and slow EMA: " + str(self.strategy.get_ema_long()))
+        
+        print("---Trade Output---")
 
         self.strategy.set_current_candlestick_time()
         self.strategy.process_seed()
 
         self.strategy.record_action()
-        self.action_writer.print_action()
     
         while (not self.cancelled):
             if(self.strategy.check_next()):
@@ -73,9 +73,7 @@ class TradeBot(object):
                         self.trade_executor.do_nothing()
                 
                 self.strategy.record_action()
-                self.action_writer.print_action()
-        
-        #print(self.account.get_account_balance()) # 1.21.24 - Need to add this to the action_writer class
+
         return
 
 def trade_bot_thread_func(inst: TradeBot):

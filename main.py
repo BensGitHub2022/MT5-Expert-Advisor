@@ -9,7 +9,11 @@ from src.ema_strategy import EmaStrategy
 from src.json_reader import JsonReader
 from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
+from api.web_service import WebService
+
+
 from src.factories.trade_executor_factory import TradeExecutionFactory
+
 
 # Path to MetaTrader5 login details.
 ACCOUNT_SETTINGS_PATH = "pkg/settings.json"
@@ -51,6 +55,10 @@ def main():
 
     account_factory = AccountFactory(production=PRODUCTION)
     account = account_factory.create_account(symbol, balance = 100000, profit = 0, action_writer=action_writer)
+
+    # FLASK. This runs on a seperate (daemon) thread
+    ws = WebService(__name__, account)
+    ws.run()
 
     trade_execution_factory = TradeExecutionFactory(production=PRODUCTION)
     trade_executor = trade_execution_factory.create_trade_executor(account)

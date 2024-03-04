@@ -31,11 +31,15 @@ class Messenger(IMessenger):
         self.lock.release()
         return message
     
-    def trade_bot_service(self, websocket):
+    def trade_bot_service(self, server_connection: websockets.server.ServerConnection):
         while (not self.cancelled):
             message = self.get_message()
             if (message != ""):
-                websocket.send(message)
+                server_connection.send(message)
+            received_msg = server_connection.recv()
+            print(received_msg)
+        server_connection.close(reason="Finished execution!")
+
 
     def server_thread_proc(self):
         self.server = websockets.sync.server.serve(self.trade_bot_service, "localhost", 5678)

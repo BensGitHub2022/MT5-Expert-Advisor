@@ -19,7 +19,7 @@ class IStrategy(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def check_next(self) -> bool:
+    def check_next(self) -> int:
         pass
     
     """

@@ -3,20 +3,31 @@ from enum import Enum
 import MetaTrader5 as mt5
 
 from src.shared_helper_functions import calc_lot_size
+from src.interfaces import IAccount, ISymbol
 
 
 class TradeExecutorMT5():
 
     current_risk_per_trade: float 
     current_lot_size: float
-    account_info: object
+    account_info: IAccount
+    symbol: ISymbol
 
-    def __init__(self, account: object) -> None:
+    def __init__(self, account: IAccount, symbol: ISymbol) -> None:
         self.current_risk_per_trade = 0.0
         self.current_lot_size = 0.0
         self.account_info = account
+        self.symbol = symbol
     
-    def place_order(self, symbol, signal, price, deviation) -> bool:
+    def place_order(self, signal, deviation) -> bool:
+        symbol = self.symbol.get_symbol_name()
+        # NOTE: You can compare the price from the market order execution to the current symbol/bid ask price in output (1.) 
+        bid = self.symbol.get_symbol_info_bid()
+        ask = self.symbol.get_symbol_info_ask()
+        if (signal['action_str'] == 'buy'):
+            price = ask
+        if (signal['action_str'] == 'sell'):
+            price = bid
 
         volume = calc_lot_size(price, self.account_info.get_account_balance())
 
@@ -25,7 +36,7 @@ class TradeExecutorMT5():
             "symbol": symbol,
             "volume": round(float(volume), 2),
             "type": OrderType[signal['action_str']].value,
-            "price": round(float(price), 2),
+            "price": 0.00,
             "deviation": deviation,
             "magic": 100,
             "comment": "python script open",
@@ -38,7 +49,7 @@ class TradeExecutorMT5():
             raise RuntimeError('Error sending order: ' + str(mt5.last_error() or ''))
         print("result of order: ")
         print(result)
-        print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal['action_str'], symbol,volume,price,deviation))
+        print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal['action_str'], symbol, volume, price, deviation))
         
         if result.retcode != mt5.TRADE_RETCODE_DONE:
             print("2. order_send failed, retcode={}".format(result.retcode))
@@ -60,15 +71,22 @@ class TradeExecutorMT5():
 
         return True
     
-    def close_position(self, position, bid, ask, deviation) -> bool:
-        
+    def close_position(self, position, deviation) -> bool:
+        # NOTE: You can compare the price from the market order execution to the current symbol/bid ask price in output (1.)
+        bid = self.symbol.get_symbol_info_bid()
+        ask = self.symbol.get_symbol_info_ask()
+        if (position.type == 1):
+            price = ask
+        if (position.type == 0):
+            price = bid
+
         request = {
             "action": TradeAction['market_order'].value,
             "position": position.ticket,
             "symbol": position.symbol,
             "volume": round(float(position.volume),2),
             "type": OrderType['buy'].value if position.type == 1 else OrderType['sell'].value,
-            "price": round(float(ask),2) if position.type == 1 else round(float(bid),2),
+            "price": 0.00,
             "deviation": deviation,
             "magic": 100,
             "comment": "python script close",
@@ -83,8 +101,8 @@ class TradeExecutorMT5():
         print("1. order_send: {} position on {} {} lots closed at {} with deviation={} points".format(
             "buy" if position.type == 1 else "sell", 
             position.symbol, 
-            round(float(position.volume),2), 
-            round(float(ask),2) if position.type == 1 else round(float(bid),2),
+            round(float(position.volume),2),
+            price,
             deviation))
         
         if result.retcode != mt5.TRADE_RETCODE_DONE:
@@ -103,10 +121,10 @@ class TradeExecutorMT5():
         print("2. order_send done, ", result) 
         print("closed POSITION_TICKET={}, profit {}".format(position.ticket, position.profit))
     
-    def close_all_positions(self, bid, ask, deviation) -> bool:
+    def close_all_positions(self, deviation) -> bool:
         positions = self.account_info.get_positions()
         for position in positions:
-            self.close_position(position, bid, ask, deviation)
+            self.close_position(position, deviation)
     
     def do_nothing(self) -> None:
         print("No actionable trades!")

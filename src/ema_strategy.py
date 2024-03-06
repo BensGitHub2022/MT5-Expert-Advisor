@@ -49,12 +49,12 @@ class EmaStrategy(IStrategy):
     # NOTE: Synchronicity needs to be addressed in a later PR
     # This is not used or relied upon but can be called to ensure that the candlesticks & ticks are relatively close to the system time. 
     # Ensure that the data we are fetching does not have too much delay from local time
-    current_system_time: int # The local time not, i.e. machine time (See comments above ^ [2]). 
+    current_system_time: int # The local time, i.e. machine time (See comments above ^ [2]). 
     
     # This is relied upon and essential to the strategy
     current_candlestick_time: int # Current candlestick time pulled from the most recent candlestick
 
-    def __init__(self, symbol: ISymbol, ema_short:int, ema_long:int, action_writer: object, console_output: bool) -> None:
+    def __init__(self, symbol: ISymbol, ema_short:int, ema_long:int, action_writer: ActionWriter, console_output: bool) -> None:
         """
         Constructor for EmaStrategy
         :param symbol: the symbol which is the focus of the ema strategy, passed as dependency injected object
@@ -245,6 +245,6 @@ Class Sell(self, signal: str):
 Class NoSignal(Self, signal: str):
     self.signal = signal
 
-Signal = union[Buy, Sell, NoSignal]
-
+Signal = union[Buy, Sell, NoSignal:
+    self.signal = signal
 """

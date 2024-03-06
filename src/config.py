@@ -32,7 +32,7 @@ class Config():
         # Example: BTCUSD 1 500 1000
         try:
             self.filepath: str = "config/" + args[0] + ".json"
-            self.production: int = int(1)
+            self.production: int = int(args[1])
             self.ema_short: int = int(args[2])
             self.ema_long: int = int(args[3])
         except:

@@ -4,9 +4,17 @@ import threading
 import websockets
 import websockets.sync
 import websockets.sync.server
+import logging
 
-class Messenger(IMessenger):
-    
+HOST = "localhost"
+PORT = 5678
+
+logging.basicConfig(
+    format="%(message)s",
+    level=logging.DEBUG,
+)
+
+class Messenger(IMessenger):    
     
     def __init__(self) -> None:
         self.sem = threading.Semaphore()
@@ -14,6 +22,7 @@ class Messenger(IMessenger):
         self.queue = list()
         self.thread = threading.Thread(target=self.server_thread_proc)
         self.cancelled = False
+        self.logger = logging.getLogger(__name__)
 
     def queue_message(self, message: str) -> bool:
         self.lock.acquire()
@@ -32,24 +41,25 @@ class Messenger(IMessenger):
         return message
     
     def trade_bot_service(self, server_connection: websockets.server.ServerConnection):
+        self.server_connection = server_connection
         while (not self.cancelled):
             message = self.get_message()
             if (message != ""):
-                server_connection.send(message)
+                self.server_connection.send(message)
             received_msg = server_connection.recv()
             print(received_msg)
-        server_connection.close(reason="Finished execution!")
-
-
+        self.server_connection.close()
+        
     def server_thread_proc(self):
-        self.server = websockets.sync.server.serve(self.trade_bot_service, "localhost", 5678)
-        self.server.serve_forever()
+        self.websocket_server = websockets.sync.server.serve(self.trade_bot_service, HOST, PORT, open_timeout=None, close_timeout=None, logger=self.logger)
+        self.websocket_server.serve_forever()
 
     def start(self):
+        print("Serving websocket on " + HOST + " at " + str(PORT) + ".")
         self.thread.start()
 
     def stop(self):
-        self.server.socket.close()
+        self.server_connection.close()
         self.cancelled = True
         self.thread.join()
         

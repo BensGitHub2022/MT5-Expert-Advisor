@@ -76,8 +76,8 @@ def main():
     trade_bot = TradeBot(messenger, context, action_writer, strategy, symbol, account, trade_executor)
     
     trade_bot.start()
-    
-    server = socketserver.BaseServer((HOST,PORT), MyTCPHandler)
+    messenger.start()
+    #server = socketserver.BaseServer((HOST,PORT), MyTCPHandler)
 
     try:
         while(not trade_bot.cancelled):
@@ -87,8 +87,9 @@ def main():
         trade_bot.cancelled = True
         trade_bot.stop()
         messenger.stop()
-        server.shutdown()
-        server.server_close()
+        #messenger.server_connection.shutdown()
+        #server.shutdown()
+        #server.server_close()
 
 if __name__ == '__main__':
     main()

@@ -33,19 +33,23 @@ class SymbolSimulator(ISymbol):
         self.counter = Counter(self.candles_df_master)
     
     def get_candlesticks(self, num_candlesticks) -> pd.DataFrame:
-        interval = self.counter.__iter__()+num_candlesticks
-        if (self.counter.check_index(interval)):
-            self.candles_df = self.candles_df_master.iloc[self.counter.__iter__():interval]
-            self.counter.__advance__(num_candlesticks)
+        if (self.counter.__hasnext__()):
+            interval = self.counter.__iter__()+num_candlesticks
+        else:
+            return pd.DataFrame()
+        self.candles_df = self.candles_df_master.iloc[self.counter.__iter__():interval]
+        self.counter.__advance__(num_candlesticks)
         return self.candles_df
     
     def get_candlestick_time(self) -> int:
         df = self.get_candlesticks(1)
+        if (df.empty):
+            return -1
         self.counter.__previous__()
         rounded_candlestick_time = int(round(df.iloc[-1]['time']))
         self.current_time = rounded_candlestick_time
         return rounded_candlestick_time
-    
+        
     def get_symbol_info_tick(self) -> dict:
         rounded_candlestick_time = int(round(self.candles_df.iloc[-1]['time']))
         tick_df = pd.DataFrame()
@@ -162,4 +166,5 @@ class Counter():
     def check_index(self, temp_index) -> bool:
         if (temp_index < 0 | temp_index >= self.dataframe_size):
             raise IndexError(f"{temp_index} is out of bounds of the current mock data!")
-        return True
+        else:
+            return True

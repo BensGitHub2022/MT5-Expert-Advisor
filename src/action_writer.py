@@ -59,6 +59,12 @@ class ActionWriter():
         self.position_history_df = pd.merge(df, account_df, how='inner',left_index=True,right_index=True)
         return self.position_history_df
     
+    def get_position_history(self) -> pd.DataFrame:
+        return self.position_history_df.to_json(orient='records')
+    
+    def get_action_history(self) -> pd.DataFrame:
+        return self.action_history_df.to_json(orient='records')
+    
     def get_date_time_now(self) -> str:
         offset = timedelta(hours=2.0)
         tz_UTC_offset = timezone(offset,'GMT')

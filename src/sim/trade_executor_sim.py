@@ -1,6 +1,5 @@
 import pandas as pd
-
-from src.interfaces import IAccount, ISymbol
+from src.interfaces import IAccount, ISymbol, IMessenger
 from src.shared_helper_functions import calc_lot_size
 from src.signal import Signal
 from src.signal_type import SignalType
@@ -11,12 +10,14 @@ class TradeExecutorSimulator():
     current_lot_size: float
     account_info: IAccount
     symbol: ISymbol
+    messenger: IMessenger
 
-    def __init__(self, account: IAccount, symbol: ISymbol) -> None:
+    def __init__(self, account: IAccount, symbol: ISymbol, messenger: IMessenger) -> None:
         self.current_risk_per_trade = 0.0
         self.current_lot_size = 0.0
         self.account_info = account
         self.symbol = symbol
+        self.messenger = messenger
     
     def place_order(self, signal: Signal, deviation) -> bool:
         symbol = self.symbol.get_symbol_name()
@@ -30,12 +31,11 @@ class TradeExecutorSimulator():
         type = signal.signal_type.value
         capital_committed = (-1)*(volume * price)
         result_add_position = self.account_info.add_position(symbol,time,type,volume,price)
-        result_update_balance = self.account_info.update_balance(capital_committed)
+        result_update_balance = self.account_info.get_account_balance()
         print("result of order: ")
         print("add position: {}, update balance: {}".format(result_add_position, result_update_balance))
         print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal.signal_type.value, symbol,volume,price,deviation))
         return True
-
     def close_position(self, position, deviation) -> bool:
         bid = self.symbol.get_symbol_info_bid()
         ask = self.symbol.get_symbol_info_ask()
@@ -61,6 +61,7 @@ class TradeExecutorSimulator():
         positions = self.account_info.get_positions()
         for position in positions:
             self.close_position(position, deviation)
+        self.messenger.queue_message(self.account_info.action_writer.get_position_history())
 
     def do_nothing(self) -> None:
         #print("No actionable trades!")

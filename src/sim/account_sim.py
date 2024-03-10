@@ -3,15 +3,13 @@ from datetime import datetime, timedelta, timezone
 import pandas as pd
 
 from src.interfaces import IAccount
-
+from src.action_writer import ActionWriter
 
 class AccountSimulator(IAccount):
     
     balance: float
     profit: float
-
     ticket: int
-    symbol: object 
     
     last_position_df: pd.DataFrame
     positions_df: pd.DataFrame
@@ -19,7 +17,7 @@ class AccountSimulator(IAccount):
 
     account_df: pd.DataFrame
 
-    action_writer: object
+    action_writer: ActionWriter
 
     def __init__(self, balance: float, profit: float, action_writer: object) -> None:
         self.balance = balance
@@ -55,11 +53,15 @@ class AccountSimulator(IAccount):
         return self.profit
         
     def add_position(self, symbol, time, type, volume, price) -> bool:
-        current_price = price 
+        current_price = price
         d = {'symbol': symbol,'ticket':self.ticket,'time':time,'type':type,'volume':volume,'price':price,'current_price':current_price,'profit':self.calc_profit(type, price, current_price)}
         new_position_df = pd.DataFrame(data=[d])
         self.positions_df = pd.concat([self.positions_df, new_position_df], ignore_index=True)
         self.ticket += 1
+        capital_committed = (-1)*(volume * price)
+        self.update_balance(capital_committed)
+        #self.update_account() # NOTE: Not working properly yet
+        #self.record_position(new_position_df, self.account_df) # NOTE: Not working properly yet
         return True
 
     def remove_position(self, ticket) -> bool:

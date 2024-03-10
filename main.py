@@ -17,23 +17,6 @@ from src.messenger import Messenger
 
 HOST, PORT = "localhost", 5678
 
-class MyTCPHandler(socketserver.BaseRequestHandler):
-    """
-    The request handler class for our server.
-
-    It is instantiated once per connection to the server, and must
-    override the handle() method to implement communication to the
-    client.
-    """
-
-    def handle(self):
-        # self.request is the TCP socket connected to the client
-        self.data = self.request.recv(1024).strip()
-        print("Received from {}:".format(self.client_address[0]))
-        print(self.data)
-        # just send back the same data, but upper-cased
-        self.request.sendall(self.data)
-
 def main():
     # NOTE: Args Key:
     # 1 - symbol name OR settings
@@ -77,7 +60,6 @@ def main():
     
     trade_bot.start()
     messenger.start()
-    #server = socketserver.BaseServer((HOST,PORT), MyTCPHandler)
 
     try:
         while(not trade_bot.cancelled):
@@ -87,9 +69,6 @@ def main():
         trade_bot.cancelled = True
         trade_bot.stop()
         messenger.stop()
-        #messenger.server_connection.shutdown()
-        #server.shutdown()
-        #server.server_close()
 
 if __name__ == '__main__':
     main()

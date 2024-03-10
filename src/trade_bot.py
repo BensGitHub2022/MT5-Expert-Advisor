@@ -62,8 +62,6 @@ class TradeBot(object):
 
         self.strategy.record_action()
 
-        counter: int = 0
-
         while (not self.cancelled):
             strategy_continue = self.strategy.check_next()
             if(strategy_continue == 1):

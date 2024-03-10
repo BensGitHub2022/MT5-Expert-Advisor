@@ -1,5 +1,13 @@
 import abc
 
+class IMessenger(abc.ABC):
+    @abc.abstractmethod
+    def queue_message(self, message: str) -> None:
+        pass
+
+    @abc.abstractmethod
+    def get_message(self) -> str:
+        pass
 
 # Meta trade interface - to abstract away and isolate MetaTrader SDK calls
 class IContext(abc.ABC):
@@ -19,7 +27,7 @@ class IStrategy(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def check_next(self) -> bool:
+    def check_next(self) -> int:
         pass
     
     """

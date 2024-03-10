@@ -32,7 +32,7 @@ class IStrategy(abc.ABC):
     
     """
     @abc.abstractmethod
-    def check_signal(self) -> bool:
+    def check_signal(self) -> Signal:
         pass
     """
 

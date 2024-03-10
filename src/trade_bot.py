@@ -3,6 +3,8 @@ import threading
 from src.action_writer import ActionWriter
 from src.interfaces import (IMessenger,IAccount, IContext, IStrategy, ISymbol,
                             ITradeExecutor)
+from src.signal import Signal
+from src.signal_type import SignalType
 
 
 class TradeBot(object):
@@ -66,22 +68,14 @@ class TradeBot(object):
             strategy_continue = self.strategy.check_next()
             if(strategy_continue == 1):
                 self.strategy.process_next()
-                signal = self.strategy.check_signal()
+                signal: Signal = self.strategy.check_signal()
                 
-                match signal.get('action'):
-                    case 1:
-                        self.messenger.queue_message("Serving websocket ... " + str(counter))
-                        counter += 1
+                match signal.signal_type:
+                    case SignalType.BUY | SignalType.SELL:
                         if(self.account.get_positions()):
                             self.trade_executor.close_all_positions(20)
                         self.trade_executor.place_order(signal,20) 
-                    case -1:
-                        self.messenger.queue_message("Serving websocket ... " + str(counter))
-                        counter += 1
-                        if(self.account.get_positions()):
-                            self.trade_executor.close_all_positions(20)
-                        self.trade_executor.place_order(signal,20) 
-                    case 0:
+                    case SignalType.SKIP:
                         self.trade_executor.do_nothing()
                 self.strategy.record_action()
             if(strategy_continue == 0):

@@ -2,8 +2,10 @@ from enum import Enum
 
 import MetaTrader5 as mt5
 
-from src.shared_helper_functions import calc_lot_size
 from src.interfaces import IAccount, ISymbol
+from src.shared_helper_functions import calc_lot_size
+from src.signal import Signal
+from src.signal_type import SignalType
 
 
 class TradeExecutorMT5():
@@ -18,16 +20,13 @@ class TradeExecutorMT5():
         self.current_lot_size = 0.0
         self.account_info = account
         self.symbol = symbol
-    
-    def place_order(self, signal, deviation) -> bool:
+
+    def place_order(self, signal: Signal, deviation) -> bool:
         symbol = self.symbol.get_symbol_name()
         # NOTE: You can compare the price from the market order execution to the current symbol/bid ask price in output (1.) 
         bid = self.symbol.get_symbol_info_bid()
         ask = self.symbol.get_symbol_info_ask()
-        if (signal['action_str'] == 'buy'):
-            price = ask
-        if (signal['action_str'] == 'sell'):
-            price = bid
+        price = ask if signal.signal_type == SignalType.BUY else bid
 
         volume = calc_lot_size(price, self.account_info.get_account_balance())
 
@@ -35,7 +34,7 @@ class TradeExecutorMT5():
             "action": TradeAction['market_order'].value,
             "symbol": symbol,
             "volume": round(float(volume), 2),
-            "type": OrderType[signal['action_str']].value,
+            "type": OrderType[signal.signal_type.value].value,
             "price": 0.00,
             "deviation": deviation,
             "magic": 100,
@@ -49,7 +48,7 @@ class TradeExecutorMT5():
             raise RuntimeError('Error sending order: ' + str(mt5.last_error() or ''))
         print("result of order: ")
         print(result)
-        print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal['action_str'], symbol, volume, price, deviation))
+        print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal.signal_type.value, symbol, volume, price, deviation))
         
         if result.retcode != mt5.TRADE_RETCODE_DONE:
             print("2. order_send failed, retcode={}".format(result.retcode))

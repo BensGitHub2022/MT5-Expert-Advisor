@@ -2,7 +2,6 @@
 import warnings # Bad
 from pandas.errors import SettingWithCopyWarning # Bad
 
-import socketserver
 import sys
 
 from src.factories.account_factory import AccountFactory
@@ -14,8 +13,6 @@ from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
 from src.config import Config
 from src.messenger import Messenger
-
-HOST, PORT = "localhost", 5678
 
 def main():
     # NOTE: Args Key:
@@ -52,7 +49,7 @@ def main():
     account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
 
     trade_execution_factory = TradeExecutionFactory(production=config.production)
-    trade_executor = trade_execution_factory.create_trade_executor(account, symbol)
+    trade_executor = trade_execution_factory.create_trade_executor(account, symbol, messenger)
     
     strategy = EmaStrategy(symbol,config.ema_short,config.ema_long, action_writer, console_output=config.production)
 

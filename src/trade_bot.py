@@ -58,7 +58,8 @@ class TradeBot(object):
         self.strategy.record_action()
 
         while (not self.cancelled):
-            if(self.strategy.check_next()):
+            strategy_continue = self.strategy.check_next()
+            if(strategy_continue == 1):
                 self.strategy.process_next()
                 signal: Signal = self.strategy.check_signal()
                 
@@ -69,9 +70,13 @@ class TradeBot(object):
                         self.trade_executor.place_order(signal,20) 
                     case SignalType.SKIP:
                         self.trade_executor.do_nothing()
-                
                 self.strategy.record_action()
-
+            if(strategy_continue == 0):
+                # put timer here?
+                continue
+            if(strategy_continue == -1):
+                print("Strategy finished executing!")
+                break
         return
 
 # Globally declared function

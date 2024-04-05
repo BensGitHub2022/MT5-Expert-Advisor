@@ -62,13 +62,13 @@ class TradeBot(object):
                 self.strategy.process_next()
                 signal: Signal = self.strategy.check_signal()
                 
-                match signal.signal_type:
-                    case SignalType.BUY | SignalType.SELL:
-                        if(self.account.get_positions()):
-                            self.trade_executor.close_all_positions(20)
-                        self.trade_executor.place_order(signal,20) 
-                    case SignalType.SKIP:
-                        self.trade_executor.do_nothing()
+                # match signal.signal_type:
+                #     case SignalType.BUY | SignalType.SELL:
+                #         if(self.account.get_positions()):
+                #             self.trade_executor.close_all_positions(20)
+                #         self.trade_executor.place_order(signal,20) 
+                #     case SignalType.SKIP:
+                #         self.trade_executor.do_nothing()
                 
                 self.strategy.record_action()
 

@@ -21,7 +21,7 @@ class AccountSimulator(IAccount):
 
     action_writer: object
 
-    def __init__(self, symbol: object, balance: float, profit: float, action_writer: object) -> None:
+    def __init__(self, balance: float, profit: float, action_writer: object) -> None:
         self.balance = balance
         self.profit = profit
         self.ticket = 500000000
@@ -29,7 +29,6 @@ class AccountSimulator(IAccount):
         self.positions_df = pd.DataFrame(columns=['symbol','ticket','time','type','volume','price','current_price','profit'])
         d = {'balance': [self.balance], 'real_profit': [self.profit]}
         self.account_df = pd.DataFrame(data=d)
-        self.symbol = symbol
         self.action_writer = action_writer
 
     def update_balance(self, capital_committed) -> float:
@@ -55,8 +54,7 @@ class AccountSimulator(IAccount):
     def get_account_profit(self) -> float:
         return self.profit
         
-    def add_position(self, symbol, type, volume, price) -> bool:
-        time = self.symbol.get_tick_time()
+    def add_position(self, symbol, time, type, volume, price) -> bool:
         current_price = price 
         d = {'symbol': symbol,'ticket':self.ticket,'time':time,'type':type,'volume':volume,'price':price,'current_price':current_price,'profit':self.calc_profit(type, price, current_price)}
         new_position_df = pd.DataFrame(data=[d])
@@ -83,12 +81,12 @@ class AccountSimulator(IAccount):
         self.record_position(self.last_position_df, self.account_df)
         return True
     
-    def update_position(self, ticket) -> bool:
+    def update_position(self, ticket, current_price) -> bool:
         position = self.positions_df.loc[self.positions_df['ticket']==ticket]
         volume = position['volume'][0]
         type = position['type'][0]
         price = position['price'][0]
-        current_price = self.get_current_price(type)
+        current_price = current_price
         profit = self.calc_profit(type, price, current_price)
         real_profit = profit*volume
         old_profit=position['profit'][0]
@@ -123,14 +121,6 @@ class AccountSimulator(IAccount):
     def get_position(self, ticket) -> pd.DataFrame:
         # Return one position out of the positions_df
         pass
-      
-    def get_current_price(self, type) -> float:
-        current_price = 0
-        if(type == 'buy'):
-            current_price = self.symbol.get_symbol_info_bid()
-        if(type == 'sell'):
-            current_price = self.symbol.get_symbol_info_ask()
-        return current_price
     
     def get_date_time_now(self) -> datetime:
         offset = timedelta(hours=2.0)

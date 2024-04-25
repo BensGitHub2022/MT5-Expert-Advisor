@@ -4,14 +4,11 @@ from pandas.errors import SettingWithCopyWarning # Bad
 
 import sys
 
-from src.factories.account_factory import AccountFactory
-from src.action_writer import ActionWriter
+from src.web_service import WebService
 from src.factories.context_factory import ContextFactory
-from src.ema_strategy import EmaStrategy
-from src.factories.symbol_factory import SymbolFactory
-from src.trade_bot import TradeBot
-from src.factories.trade_executor_factory import TradeExecutionFactory
+from src.pool_manager import PoolManager
 from src.config import Config
+from src.trade_executor import TradeExecutor
 
 def main():
     # NOTE: Args Key:
@@ -35,33 +32,14 @@ def main():
     # Composition root
     print("Hello Trade Bot!")
 
-    action_writer = ActionWriter()
-
-    context_factory = ContextFactory(production=config.production)
+    context_factory = ContextFactory(production=True)
     context = context_factory.create_context(config.credentials)
     
-    symbol_factory = SymbolFactory(production=config.production)
-    symbol = symbol_factory.create_symbol(config.symbol, config.timeframe, candles_mock_location=config.candlesticks_filepath, ticks_mock_location=config.ticks_filepath)
-
-    account_factory = AccountFactory(production=config.production)
-    account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
-
-    trade_execution_factory = TradeExecutionFactory(production=config.production)
-    trade_executor = trade_execution_factory.create_trade_executor(account, symbol)
+    WebService(__name__, context).run()
     
-    strategy = EmaStrategy(symbol,config.ema_short,config.ema_long, action_writer, console_output=config.production)
-
-    trade_bot = TradeBot(context, action_writer, strategy, symbol, account, trade_executor)
-    
-    trade_bot.start()
-    
-    try:
-        while(not trade_bot.cancelled):
-            kill_bot = input()
-            print(kill_bot + " is not a recognized command!")
-    except KeyboardInterrupt:
-        trade_bot.cancelled = True
-        trade_bot.stop()
+    trade_executor = TradeExecutor(context)
+    pool_manager = PoolManager()
+    pool_manager.pool.submit(trade_executor.execute_trades, pool_manager.pipeline, pool_manager.event)
 
 if __name__ == '__main__':
     main()

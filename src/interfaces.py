@@ -66,6 +66,13 @@ class IAccount(abc.ABC):
     def get_account_balance(self) -> float:
         pass
 
-    
+    @abc.abstractmethod
+    def get_deal_history(self) -> dict:
+        pass
+
+    @abc.abstractmethod
+    def get_account_info(self) -> dict:
+        pass
+
 
 

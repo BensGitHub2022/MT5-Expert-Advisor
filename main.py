@@ -4,11 +4,9 @@ from pandas.errors import SettingWithCopyWarning # Bad
 
 import sys
 
-from src.web_service import WebService
-from src.factories.context_factory import ContextFactory
-
-from src.pool_manager import PoolManager
 from api.web_service import WebService
+from src.factories.context_factory import ContextFactory
+from src.pool_manager import PoolManager
 
 from src.config import Config
 from src.trade_executor import TradeExecutor
@@ -38,7 +36,7 @@ def main():
     context_factory = ContextFactory(production=True)
     context = context_factory.create_context(config.credentials)
 
-    WebService(__name__, context).run()
+    WebService(__name__, None, context).run()
 
     trade_executor = TradeExecutor(context)
     pool_manager = PoolManager()

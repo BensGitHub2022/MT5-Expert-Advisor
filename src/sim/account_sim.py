@@ -139,3 +139,9 @@ class AccountSimulator(IAccount):
         self.action_writer.record_position(position_df, action_df)
         self.action_writer.write_position()
         return True
+
+    def get_account_info(self):
+        return NotImplementedError()
+    
+    def get_deal_history(self):
+        return NotImplementedError()

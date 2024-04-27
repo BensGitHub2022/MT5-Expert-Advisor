@@ -1,4 +1,5 @@
 import MetaTrader5 as mt5
+from datetime import datetime;
 
 from src.interfaces import IAccount
 
@@ -21,11 +22,23 @@ class AccountMT5(IAccount):
         profit = account_info_dict['profit']
         return profit
     
-    def get_positions(self) -> tuple: # Note on 1.21.24 that MT5 returns positions as a named Tuple
-        positions = mt5.positions_get()
-        if positions is None:
+    def get_positions(self) -> dict: # Note on 1.21.24 that MT5 returns positions as a named Tuple
+        try:
+            pos = mt5.positions_get()
+            return { "positions": pos }
+        except BaseException:
             raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
-        return positions
+    
+    def get_deal_history(self) -> dict:
+        try:
+            start = datetime(2010, 1, 1)
+            end = datetime.now()
+            deals = mt5.history_deals_get(start, end)
+            list = [deal._asdict() for deal in deals]
+            return { "history": list }
+        except BaseException:
+            raise RuntimeError('No historical positions returned from MT5. Error is ' + str(mt5.last_error() or ''))
+
 
     # NOTE: The presentation of positions is much more human readable when you use the code below.
     # In order to log the output of positions to a csv file it might be beneficial to uncomment this function and send it to action_writer

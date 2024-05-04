@@ -2,6 +2,7 @@ import concurrent.futures
 import queue
 import threading
 
+# This class is a singleton. There should only ever be one thread pool manager.
 class PoolManager(object):
     pool : concurrent.futures.ThreadPoolExecutor
     pipeline: queue.Queue

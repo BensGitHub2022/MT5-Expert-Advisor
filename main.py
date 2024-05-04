@@ -41,6 +41,9 @@ def main():
     trade_executor = TradeExecutor(context)
     pool_manager = PoolManager()
     pool_manager.pool.submit(trade_executor.execute_trades, pool_manager.pipeline, pool_manager.event)
+    
+    print('Enter the name of the symbol you would like to trade on: ')
+    input()
 
 if __name__ == '__main__':
     main()

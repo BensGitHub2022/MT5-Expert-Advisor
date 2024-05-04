@@ -115,11 +115,11 @@ class EmaStrategy(IStrategy):
         if (current_candlestick_time != self.current_candlestick_time):
             self.current_candlestick_time = current_candlestick_time
             if(self.console_output):
-                print("New candle!")
+                print("New candle for " + self.symbol.symbol_name + "!")
             return True
         else:
             if(self.console_output):
-                print("... sleeping")
+                print("... " + self.symbol.symbol_name + " is sleeping")
             # NOTE: The strategy class controls sleep time intervals right now which is a problem.
             # This needs to be syncronized with MetaTrader server time as closely as possible.
             # Right now, if we increase the sleep window then the trader will only check for candles on longer intervals which is bad for the strategy

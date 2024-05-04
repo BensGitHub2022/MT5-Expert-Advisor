@@ -7,7 +7,7 @@ CREDENTIALS_FILE_PATH = "config/credentials.json"
 EMA_SHORT = 500
 EMA_LONG = 1000
 
-PRODUCTION = False # added for convenience, all factories eventually created in main and passed to trade_bot
+PRODUCTION = True # added for convenience, all factories eventually created in main and passed to trade_bot
 
 class Config():
 

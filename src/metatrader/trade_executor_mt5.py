@@ -122,11 +122,11 @@ class TradeExecutorMT5():
     
     def close_all_positions(self, deviation) -> bool:
         positions = self.account_info.get_positions()
-        for position in positions:
+        for position in positions["positions"]:
             self.close_position(position, deviation)
     
     def do_nothing(self) -> None:
-        print("No actionable trades!")
+        print("No actionable trades for " + self.symbol.symbol_name + "!")
         return
     
 class OrderType(Enum):

@@ -11,7 +11,7 @@ from src.factories.trade_executor_factory import TradeExecutionFactory
 
 class TradeBotInitializer():
     counter = 0
-    symbol_names = ["crm", "msft", "bby"]
+    symbol_names = ["USDCNH", "USDJPY", "EURUSD"]
     mt5_context: IContext
     
     def __init__(self, context: IContext):
@@ -29,7 +29,7 @@ class TradeBotInitializer():
         trade_execution_factory = TradeExecutionFactory(True)
         trade_executor = trade_execution_factory.create_trade_executor(account, symbol)
         
-        strategy = EmaStrategy(symbol, 5, 10, action_writer, console_output=True)
+        strategy = EmaStrategy(symbol, 2, 3, action_writer, console_output=True)
 
         trade_bot = TradeBot(self.mt5_context, action_writer, strategy, symbol, account, trade_executor)
         

@@ -119,6 +119,7 @@ class TradeExecutorMT5():
 
         print("2. order_send done, ", result) 
         print("closed POSITION_TICKET={}, profit {}".format(position.ticket, position.profit))
+        return True
     
     def close_all_positions(self, deviation) -> bool:
         positions = self.account_info.get_positions()

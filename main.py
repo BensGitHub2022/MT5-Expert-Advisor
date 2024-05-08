@@ -10,6 +10,9 @@ from src.factories.context_factory import ContextFactory
 from src.ema_strategy import EmaStrategy
 from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
+from api.web_service import WebService
+
+
 from src.factories.trade_executor_factory import TradeExecutionFactory
 from src.config import Config
 from src.messenger import Messenger
@@ -47,6 +50,10 @@ def main():
 
     account_factory = AccountFactory(production=config.production)
     account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
+
+    # FLASK. This runs on a seperate (daemon) thread
+    ws = WebService(__name__, account)
+    ws.run()
 
     trade_execution_factory = TradeExecutionFactory(production=config.production)
     trade_executor = trade_execution_factory.create_trade_executor(account, symbol, messenger)

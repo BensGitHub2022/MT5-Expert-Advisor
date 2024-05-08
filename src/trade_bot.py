@@ -39,7 +39,6 @@ class TradeBot(object):
     def start(self):
         print("Trade Bot started execution!")
         print("Press 'ctrl + C' to stop")
-        #self.messenger.start()
         self.thread.start()
         
     def stop(self):

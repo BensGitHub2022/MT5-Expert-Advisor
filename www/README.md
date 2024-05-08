@@ -1,6 +1,4 @@
 # Quickstart
 
-1. cd www
-2. npm install
-3. npm run dev
-4. in browser go to http://localhost:1234
+1. go to file path ~\Documents\GitHub\MT5_Expert_Advisor\www
+2. launch index.html & show_messages.html in a web browser

@@ -2,7 +2,7 @@
     "mt5": {
         "symbol": "BTCUSD",
         "timeframe": "one_minute",
-        "candlesticks": "mock/BTCUSD_candlesticks_from_1672531500_to_1688083080.csv",
-        "ticks": "mock/BTCUSD_ticks_from_1672531500_to_1688083080.csv"
+        "candlesticks": "mock/candlesticks_BTCUSD_from_1672531500_to_1688083080.csv",
+        "ticks": "mock/ticks_BTCUSD_from_1672531500_to_1688083080.csv"
     }
 }

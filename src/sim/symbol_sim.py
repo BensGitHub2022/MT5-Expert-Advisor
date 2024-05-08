@@ -91,7 +91,7 @@ class SymbolSimulator(ISymbol):
         :param candles_mock_location: The path to the mock data which is stored in candlesticks (bar chart format) as a csv
         :return: The candlesticks master dataframe with ALL mock data to be tested.
         """
-        candles_df_master = pd.read_csv(candles_mock_location,index_col=0)
+        candles_df_master = pd.read_csv(candles_mock_location,index_col=0,sep=",", low_memory=False)
         return candles_df_master
     
     # Get ticks master file
@@ -101,7 +101,7 @@ class SymbolSimulator(ISymbol):
         :param ticks_mock_location: The path to the mock data which is stored in ticks (price movement) as a csv
         :return: The ticks master dataframe with ALL mock data to be tested.
         """
-        ticks_df_master = pd.read_csv(ticks_mock_location, index_col=0)
+        ticks_df_master = pd.read_csv(ticks_mock_location, index_col=0,sep=",", low_memory=False)
         return ticks_df_master
 
 # Advances through candlesticks stored in data frame from csv file

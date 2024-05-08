@@ -29,13 +29,14 @@ class TradeExecutorSimulator():
         balance = self.account_info.get_account_balance()
         volume = calc_lot_size(price, balance)
         type = signal.signal_type.value
-        capital_committed = (-1)*(volume * price)
         result_add_position = self.account_info.add_position(symbol,time,type,volume,price)
         result_update_balance = self.account_info.get_account_balance()
         print("result of order: ")
         print("add position: {}, update balance: {}".format(result_add_position, result_update_balance))
         print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal.signal_type.value, symbol,volume,price,deviation))
+        self.messenger.queue_message(self.account_info.action_writer.get_position_history())
         return True
+    
     def close_position(self, position, deviation) -> bool:
         bid = self.symbol.get_symbol_info_bid()
         ask = self.symbol.get_symbol_info_ask()

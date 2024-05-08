@@ -60,8 +60,8 @@ class AccountSimulator(IAccount):
         self.ticket += 1
         capital_committed = (-1)*(volume * price)
         self.update_balance(capital_committed)
-        #self.update_account() # NOTE: Not working properly yet
-        #self.record_position(new_position_df, self.account_df) # NOTE: Not working properly yet
+        self.update_account()
+        self.record_position(new_position_df, self.account_df)
         return True
 
     def remove_position(self, ticket) -> bool:

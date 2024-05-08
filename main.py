@@ -15,7 +15,7 @@ from api.web_service import WebService
 
 from src.factories.trade_executor_factory import TradeExecutionFactory
 from src.config import Config
-from src.messenger import Messenger
+from src.ws_server import Messenger, TradeBotWebsocketServer
 
 def main():
     # NOTE: Args Key:
@@ -41,6 +41,7 @@ def main():
 
     action_writer = ActionWriter()
     messenger = Messenger()
+    ws_server = TradeBotWebsocketServer(messenger)
 
     context_factory = ContextFactory(production=config.production)
     context = context_factory.create_context(config.credentials)
@@ -64,6 +65,7 @@ def main():
     
     trade_bot.start()
     messenger.start()
+    ws_server.start()
 
     try:
         while(not trade_bot.cancelled):
@@ -72,6 +74,7 @@ def main():
     except KeyboardInterrupt:
         trade_bot.cancelled = True
         trade_bot.stop()
+        ws_server.stop()
         messenger.stop()
 
 if __name__ == '__main__':

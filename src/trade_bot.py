@@ -44,10 +44,6 @@ class TradeBot(object):
 
     def thread_func(self):
 
-        connected = self.context.connect()
-        if (not connected):
-            return
-
         print("Using the " + self.strategy.get_strategy_name() + ", trading on " + self.symbol.get_symbol_name() + ", at " + self.symbol.get_symbol_timeframe() + ", with fast EMA: " + str(self.strategy.get_ema_short()) + " and slow EMA: " + str(self.strategy.get_ema_long()))
         
         print("---Trade Output---")

@@ -31,7 +31,7 @@ class ContextMT5(IContext):
                 pathway, login=login, password=password, server=server, timeout=timeout
             )
             if initialized:
-                print("Trading bot initialized!")
+                print("Trading account initialized!")
             else:
                 raise ConnectionError
 
@@ -41,7 +41,7 @@ class ContextMT5(IContext):
             )
 
             if logged_in:
-                print("Trading bot login successful!")
+                print("Trading account login successful!")
             else:
                 raise PermissionError
 

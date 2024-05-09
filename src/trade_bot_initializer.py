@@ -32,7 +32,7 @@ class TradeBotInitializer():
         trade_bot = TradeBot(self.mt5_context, action_writer, strategy, symbol, account, trade_executor)
         
         pool_manager = PoolManager()
-        pool_manager.pool.submit(trade_bot.start,)
+        pool_manager.pool.submit(trade_bot.start)
         self.counter += 1
         
         return "200"

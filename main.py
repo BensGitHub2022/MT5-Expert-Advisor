@@ -35,15 +35,13 @@ def main():
 
     context_factory = ContextFactory(production=True)
     context = context_factory.create_context(config.credentials)
-
-    WebService(__name__, None, context).run()
-
+    context.connect()
     trade_executor = TradeExecutor(context)
     pool_manager = PoolManager()
     pool_manager.pool.submit(trade_executor.execute_trades, pool_manager.pipeline, pool_manager.event)
-    
-    print('Enter the name of the symbol you would like to trade on: ')
-    input()
+
+    web_service = WebService(__name__, None, context)
+    web_service.run()
 
 if __name__ == '__main__':
     main()

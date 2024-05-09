@@ -105,18 +105,20 @@ class EmaStrategy(IStrategy):
         self.process_new_emas(self.new_candle_df)
         return True
 
-    def check_next(self)->bool:
+    def check_next(self)->int:
         """
         This method checks to see if there is a new candlestick available to make decisions on. It compares the epoch time in the current candlestick retreived from the metatrader API to the candlestick time stored within the EmaStrategy class.
         :param current_candlestick_time: The candlestick time passed to the method as an int from a candlestick object.
         :return: True if the passed candlestick time is different than the stored current time. False if the times are the same.
         """
         current_candlestick_time = self.symbol.get_candlestick_time()
+        if (current_candlestick_time == -1):
+            return -1
         if (current_candlestick_time != self.current_candlestick_time):
             self.current_candlestick_time = current_candlestick_time
             if(self.console_output):
                 print("New candle!")
-            return True
+            return 1
         else:
             if(self.console_output):
                 print("... sleeping")
@@ -125,7 +127,7 @@ class EmaStrategy(IStrategy):
             # Right now, if we increase the sleep window then the trader will only check for candles on longer intervals which is bad for the strategy
             # because it needs to identify entry and exit points as closely as possible to when an actionable trade is found from an incoming candle.
             time.sleep(1)
-            return False
+            return 0
 
     def process_seed_emas(self, data: pd.DataFrame) -> bool:
         self.action_df['EMA_short'] = ta.EMA(data['close'], timeperiod=self.ema_short)

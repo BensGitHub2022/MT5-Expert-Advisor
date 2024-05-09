@@ -2,7 +2,7 @@
     "mt5": {
         "symbol": "SOLUSD",
         "timeframe": "one_minute",
-        "candlesticks": "mock/SOLUSD_candlesticks_from_1704067500_to_1704585480.csv",
-        "ticks": "mock/SOLUSD_ticks_from_1704067500_to_1704585480.csv"
+        "candlesticks": "mock/sim_candlesticks_SOLUSD_from_1704067500_to_1704585480.csv",
+        "ticks": "mock/sim_ticks_SOLUSD_from_1704067500_to_1704585480.csv"
     }
 }

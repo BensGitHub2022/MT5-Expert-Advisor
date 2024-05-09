@@ -15,6 +15,7 @@ from api.web_service import WebService
 
 from src.factories.trade_executor_factory import TradeExecutionFactory
 from src.config import Config
+from src.ws_server import Messenger, TradeBotWebsocketServer
 
 def main():
     # NOTE: Args Key:
@@ -39,6 +40,8 @@ def main():
     print("Hello Trade Bot!")
 
     action_writer = ActionWriter()
+    messenger = Messenger()
+    ws_server = TradeBotWebsocketServer(messenger)
 
     context_factory = ContextFactory(production=config.production)
     context = context_factory.create_context(config.credentials)
@@ -54,14 +57,16 @@ def main():
     ws.run()
 
     trade_execution_factory = TradeExecutionFactory(production=config.production)
-    trade_executor = trade_execution_factory.create_trade_executor(account, symbol)
+    trade_executor = trade_execution_factory.create_trade_executor(account, symbol, messenger)
     
     strategy = EmaStrategy(symbol,config.ema_short,config.ema_long, action_writer, console_output=config.production)
 
-    trade_bot = TradeBot(context, action_writer, strategy, symbol, account, trade_executor)
+    trade_bot = TradeBot(messenger, context, action_writer, strategy, symbol, account, trade_executor)
     
     trade_bot.start()
-    
+    messenger.start()
+    ws_server.start()
+
     try:
         while(not trade_bot.cancelled):
             kill_bot = input()
@@ -69,6 +74,9 @@ def main():
     except KeyboardInterrupt:
         trade_bot.cancelled = True
         trade_bot.stop()
+        ws_server.stop()
+        messenger.stop()
 
 if __name__ == '__main__':
     main()
+

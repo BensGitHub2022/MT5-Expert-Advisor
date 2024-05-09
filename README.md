@@ -3,16 +3,17 @@
 ### QUICKSTART
 1. `git clone https://github.com/BensGitHub2022/MT5-Expert-Advisor.git`
 2. `cd MT5-Expert-Advisor`
-3. `python -m venv .venv`
-4. `source .venv/Scripts/activate`
+3. `pip install pipenv`
+4. `py -m venv .venv`
 5. `pip install -r requirements.txt`
-6. Setup pkg/credentials.json. More on this [here](#set-your-mt5-account-credentials-in-credentialsjson).
-7. `python main.py`
+6. Setup config/credentials.json. More on this [here](#set-your-mt5-account-credentials-in-credentialsjson).
+7. `mkdir log`
+8. `python .\main.py <symbol> <production_flag> <ema_short> <ema_long>`
  
 ## Dependencies
 
 ### Install Python
-BBSTrader requires [Python](https://www.python.org/downloads/) version 3.10.
+MetaTrader 5 requires [Python](https://www.python.org/downloads/) version 3.10.
 
 ### Install MetaTrader 5
 Currently, MetaTrader 5 supports the following platforms:
@@ -34,13 +35,13 @@ The following **credentials.json** fields must be set for BBSTrader to work:
 * _terminal_pathway_--The file path to MetaTrader's **terminal64.exe**
 * _login_--Your MetaTrader 5 login ID
 * _password_--Your MetaTrader 5 password
+* _timeout_--The number of milliseconds allocated to attempt connection establishment before timing out.
 
 ### Modify Settings.json to adjust how you trade
 The following **settings.json** fields must be set for BBSTrader to work:
 * _timeframe_--The MetaTrader5 timeframe to use. If you are unsure what this is, learn more [here](https://myforex.com/en/mt5guide/change-timeframes.html).
 The remaining fields may be updated to your liking:
 * _symbols_--An array of valid MetaTrader5 trading symbols
-* _timeout_--The number of milliseconds allocated to attempt connection establishment before timing out.
 
 ### Testing
 Tests are located in the tests subdirectory. To run all of the tests in the terminal, run

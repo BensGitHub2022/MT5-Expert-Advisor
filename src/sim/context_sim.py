@@ -4,7 +4,6 @@ from src.interfaces import IContext
 
 class ContextSimulator(IContext):
 
-    json_settings: dict
     credentials: dict    
 
     def __init__(self, credentials: dict):

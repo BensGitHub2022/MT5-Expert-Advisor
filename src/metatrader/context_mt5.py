@@ -1,18 +1,11 @@
 import MetaTrader5 as mt5
 
 from src.interfaces import IContext
-
+from src.json_reader import JsonReader
 
 class ContextMT5(IContext): 
 
-    credentials: dict
-
-    def __init__(self, credentials: dict):
-        """
-        Initializes MetaTrader object
-        :param credentials: A dict containing MetaTrader5 login details.
-        """
-        self.credentials = credentials
+    CREDENTIALS_FILE_PATH = "config/credentials.json"
 
     def connect(self) -> bool:
         """
@@ -21,11 +14,12 @@ class ContextMT5(IContext):
         """
 
         try:
-            pathway = self.credentials["mt5"]["terminal_pathway"]
-            login = self.credentials["mt5"]["login"]
-            password = self.credentials["mt5"]["password"]
-            server = self.credentials["mt5"]["server"]
-            timeout = self.credentials["mt5"]["timeout"]
+            credentials = JsonReader(file_path=self.CREDENTIALS_FILE_PATH).get_json_data()
+            pathway = credentials["mt5"]["terminal_pathway"]
+            login = credentials["mt5"]["login"]
+            password = credentials["mt5"]["password"]
+            server = credentials["mt5"]["server"]
+            timeout = credentials["mt5"]["timeout"]
 
             initialized = mt5.initialize(
                 pathway, login=login, password=password, server=server, timeout=timeout

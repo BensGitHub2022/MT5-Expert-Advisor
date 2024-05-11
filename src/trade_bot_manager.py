@@ -1,3 +1,4 @@
+from uuid import uuid4
 from src.interfaces import IContext
 from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
@@ -8,13 +9,16 @@ from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
 # from src.ws_server import Messenger
 
-class TradeBotInitializer():
+class TradeBotManager():
     mt5_context: IContext
     pool_manager: PoolManager
+    trade_bot_id_future_map: dict
+    id_bot_map: dict
     
     def __init__(self, context: IContext, pool_manager: PoolManager):
         self.mt5_context = context
         self.pool_manager = pool_manager
+        self.id_bot_map = dict()
     
     def start_trade_bot(self, symbol_name: str, ema_short: int, ema_long: int, messenger: str):
         action_writer = ActionWriter()
@@ -33,8 +37,25 @@ class TradeBotInitializer():
         trade_bot = TradeBot(messenger, self.mt5_context, action_writer, strategy, symbol, account, trade_executor)
         
         try: 
-            self.pool_manager.pool.submit(trade_bot.start)
+            self.pool_manager.pool.submit(trade_bot.run)
+            self.id_bot_map[trade_bot.uuid] = trade_bot
+            return trade_bot.get_properties_as_dict()
         except:
-            return False
+            return None
+    
+    def delete_trade_bot(self, bot_id: int):
+        if bot_id in self.id_bot_map:
+            self.id_bot_map[bot_id].cancel()
+            del self.id_bot_map[bot_id]
+            return True
+        return False
 
-        return True
+    def get_details_for_all_bots(self):
+        bot_details = []
+        for bot in self.id_bot_map.values():
+            bot_details.append(bot.get_properties_as_dict())
+        return bot_details
+    
+    def stop_all_bots(self):
+        for bot in self.id_bot_map.values():
+            bot.cancel()

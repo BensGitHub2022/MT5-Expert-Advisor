@@ -7,6 +7,8 @@ from src.factories.context_factory import ContextFactory
 from src.pool_manager import PoolManager
 
 from src.constants import production
+from src.trade_bot_manager import TradeBotManager
+# from src.ws_server import Messenger, TradeBotWebsocketServer
 
 def main():
     # NOTE: (Supress warnings) Need to decide if these present true issues.
@@ -26,11 +28,28 @@ def main():
     context = context_factory.create_context()
     context.connect()
     
+    # set up web socket
+    messenger = None
+    # ws_server = TradeBotWebsocketServer(messenger)
+    # messenger.start()
+    # ws_server.start()
+    
     # set up thread pool for trade bots
-    pool_manager = PoolManager()
-    web_service = WebService(__name__, None, context, pool_manager)
+    trade_bot_manager = TradeBotManager(context, PoolManager())
+    web_service = WebService(__name__, None, trade_bot_manager, messenger)
     web_service.run()
-    return web_service
+    
+    # stay alive until there's a keyboard interrupt
+    try:
+        while(True):
+            kill_bot = input()
+            print(kill_bot + " is not a recognized command!")
+    except KeyboardInterrupt:
+        print("shutting down")
+        trade_bot_manager.stop_all_bots()
+        web_service.stop()
+        # ws_server.stop()
+        # messenger.stop()
     
     input()
 

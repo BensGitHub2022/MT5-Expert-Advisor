@@ -33,19 +33,23 @@ class SymbolSimulator(ISymbol):
         self.counter = Counter(self.candles_df_master)
     
     def get_candlesticks(self, num_candlesticks) -> pd.DataFrame:
-        interval = self.counter.__iter__()+num_candlesticks
-        if (self.counter.check_index(interval)):
-            self.candles_df = self.candles_df_master.iloc[self.counter.__iter__():interval]
-            self.counter.__advance__(num_candlesticks)
+        if (self.counter.__hasnext__()):
+            interval = self.counter.__iter__()+num_candlesticks
+        else:
+            return pd.DataFrame()
+        self.candles_df = self.candles_df_master.iloc[self.counter.__iter__():interval]
+        self.counter.__advance__(num_candlesticks)
         return self.candles_df
     
     def get_candlestick_time(self) -> int:
         df = self.get_candlesticks(1)
+        if (df.empty):
+            return -1
         self.counter.__previous__()
         rounded_candlestick_time = int(round(df.iloc[-1]['time']))
         self.current_time = rounded_candlestick_time
         return rounded_candlestick_time
-    
+        
     def get_symbol_info_tick(self) -> dict:
         rounded_candlestick_time = int(round(self.candles_df.iloc[-1]['time']))
         tick_df = pd.DataFrame()
@@ -87,7 +91,7 @@ class SymbolSimulator(ISymbol):
         :param candles_mock_location: The path to the mock data which is stored in candlesticks (bar chart format) as a csv
         :return: The candlesticks master dataframe with ALL mock data to be tested.
         """
-        candles_df_master = pd.read_csv(candles_mock_location,index_col=0)
+        candles_df_master = pd.read_csv(candles_mock_location,index_col=0,sep=",", low_memory=False)
         return candles_df_master
     
     # Get ticks master file
@@ -97,7 +101,7 @@ class SymbolSimulator(ISymbol):
         :param ticks_mock_location: The path to the mock data which is stored in ticks (price movement) as a csv
         :return: The ticks master dataframe with ALL mock data to be tested.
         """
-        ticks_df_master = pd.read_csv(ticks_mock_location, index_col=0)
+        ticks_df_master = pd.read_csv(ticks_mock_location, index_col=0,sep=",", low_memory=False)
         return ticks_df_master
 
 # Advances through candlesticks stored in data frame from csv file
@@ -162,4 +166,5 @@ class Counter():
     def check_index(self, temp_index) -> bool:
         if (temp_index < 0 | temp_index >= self.dataframe_size):
             raise IndexError(f"{temp_index} is out of bounds of the current mock data!")
-        return True
+        else:
+            return True

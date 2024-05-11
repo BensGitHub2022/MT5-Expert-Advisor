@@ -14,7 +14,7 @@ class SymbolMT5(ISymbol):
     candles_df: pd.DataFrame
 
     symbol_name: str 
-    mt5_timeframe: int
+    mt5_timeframe: object
     timeframe: str
     start_pos: int
     

@@ -4,7 +4,6 @@ from pandas.errors import SettingWithCopyWarning # Bad
 
 from api.web_service import WebService
 from src.factories.context_factory import ContextFactory
-from src.interfaces import IContext
 from src.pool_manager import PoolManager
 
 from src.constants import production
@@ -21,21 +20,20 @@ def main():
 
     # Composition root
     print("Hello Trade Bot!")
-    context = authenticate_trading_account()
-    set_up_thread_pool(context)
-    
-    input()
 
-def authenticate_trading_account() ->  IContext:
+    # authenticate and log into trading account
     context_factory = ContextFactory(production)
     context = context_factory.create_context()
     context.connect()
     
-def set_up_thread_pool(context: IContext) -> WebService:
+    # set up thread pool for trade bots
     pool_manager = PoolManager()
     web_service = WebService(__name__, None, context, pool_manager)
     web_service.run()
     return web_service
+    
+    input()
 
 if __name__ == '__main__':
     main()
+

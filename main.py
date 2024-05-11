@@ -3,7 +3,6 @@ import warnings # Bad
 from pandas.errors import SettingWithCopyWarning # Bad
 
 from api.web_service import WebService
-from src.pool_manager import PoolManager
 
 from src.trade_bot_manager import TradeBotManager
 # from src.ws_server import Messenger, TradeBotWebsocketServer

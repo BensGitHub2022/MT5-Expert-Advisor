@@ -5,7 +5,6 @@ from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
 from src.ema_strategy import EmaStrategy
 from src.factories.symbol_factory import SymbolFactory
-from src.pool_manager import PoolManager
 from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
 from src.constants import production

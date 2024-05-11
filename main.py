@@ -3,10 +3,8 @@ import warnings # Bad
 from pandas.errors import SettingWithCopyWarning # Bad
 
 from api.web_service import WebService
-from src.factories.context_factory import ContextFactory
 from src.pool_manager import PoolManager
 
-from src.constants import production
 from src.trade_bot_manager import TradeBotManager
 # from src.ws_server import Messenger, TradeBotWebsocketServer
 
@@ -22,11 +20,6 @@ def main():
 
     # Composition root
     print("Hello Trade Bot!")
-
-    # authenticate and log into trading account
-    context_factory = ContextFactory(production)
-    context = context_factory.create_context()
-    context.connect()
     
     # set up web socket
     messenger = None
@@ -34,8 +27,8 @@ def main():
     # messenger.start()
     # ws_server.start()
     
-    # set up thread pool for trade bots
-    trade_bot_manager = TradeBotManager(context, PoolManager())
+    # set up trade bot manager (manages bot thread pool)
+    trade_bot_manager = TradeBotManager()
     web_service = WebService(__name__, None, trade_bot_manager, messenger)
     web_service.run()
     

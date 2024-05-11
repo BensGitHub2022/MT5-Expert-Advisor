@@ -1,4 +1,5 @@
-from uuid import uuid4
+import concurrent.futures
+from src.factories.context_factory import ContextFactory
 from src.interfaces import IContext
 from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
@@ -7,18 +8,26 @@ from src.factories.symbol_factory import SymbolFactory
 from src.pool_manager import PoolManager
 from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
+from src.constants import production
 # from src.ws_server import Messenger
 
+# This class is a singleton. There should only ever be one trade bot manager
 class TradeBotManager():
-    mt5_context: IContext
-    pool_manager: PoolManager
-    trade_bot_id_future_map: dict
+
+    context: IContext
+    pool : concurrent.futures.ThreadPoolExecutor
     id_bot_map: dict
-    
-    def __init__(self, context: IContext, pool_manager: PoolManager):
-        self.mt5_context = context
-        self.pool_manager = pool_manager
-        self.id_bot_map = dict()
+
+    def __new__(self):
+        if not hasattr(self, 'instance'):
+            context_factory = ContextFactory(production)
+            self.context = context_factory.create_context()
+            self.context.connect()
+
+            self.pool = concurrent.futures.ThreadPoolExecutor()
+            self.id_bot_map = dict()
+            self.instance = super(TradeBotManager, self).__new__(self)
+        return self.instance
     
     def start_trade_bot(self, symbol_name: str, ema_short: int, ema_long: int, messenger: str):
         action_writer = ActionWriter()
@@ -34,10 +43,10 @@ class TradeBotManager():
         
         strategy = EmaStrategy(symbol, ema_short, ema_long, action_writer, console_output=True)
 
-        trade_bot = TradeBot(messenger, self.mt5_context, action_writer, strategy, symbol, account, trade_executor)
+        trade_bot = TradeBot(messenger, self.context, action_writer, strategy, symbol, account, trade_executor)
         
         try: 
-            self.pool_manager.pool.submit(trade_bot.run)
+            self.pool.submit(trade_bot.run)
             self.id_bot_map[trade_bot.uuid] = trade_bot
             return trade_bot.get_properties_as_dict()
         except:

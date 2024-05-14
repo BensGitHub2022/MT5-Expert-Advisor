@@ -1,4 +1,5 @@
 import concurrent.futures
+from src.config import Config
 from src.factories.context_factory import ContextFactory
 from src.interfaces import IContext
 from src.factories.account_factory import AccountFactory
@@ -35,16 +36,16 @@ class TradeBotManager():
         return self.instance
     
     def start_trade_bot(self, symbol_name: str, ema_short: int, ema_long: int):
-
+        config = Config(symbol_name)
         action_writer = ActionWriter()
         
-        symbol_factory = SymbolFactory(True)
-        symbol = symbol_factory.create_symbol(symbol_name, "one_minute", candles_mock_location='config.candlesticks_filepath', ticks_mock_location='config.ticks_filepath')
+        symbol_factory = SymbolFactory(production)
+        symbol = symbol_factory.create_symbol(symbol_name, config.timeframe, candles_mock_location=config.candlesticks_filepath, ticks_mock_location=config.ticks_filepath)
 
-        account_factory = AccountFactory(True)
+        account_factory = AccountFactory(production)
         account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
 
-        trade_execution_factory = TradeExecutionFactory(True)
+        trade_execution_factory = TradeExecutionFactory(production)
         messenger = self.messenger if self.first_bot_created else None
         trade_executor = trade_execution_factory.create_trade_executor(account, symbol, messenger)
         

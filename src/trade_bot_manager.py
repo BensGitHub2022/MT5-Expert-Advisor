@@ -8,27 +8,34 @@ from src.factories.symbol_factory import SymbolFactory
 from src.trade_bot import TradeBot
 from src.factories.trade_executor_factory import TradeExecutionFactory
 from src.constants import production
-# from src.ws_server import Messenger
+from src.ws_server import Messenger, TradeBotWebsocketServer
 
 # This class is a singleton. There should only ever be one trade bot manager
 class TradeBotManager():
 
     context: IContext
-    pool : concurrent.futures.ThreadPoolExecutor
+    first_bot_created: bool
     id_bot_map: dict
+    messenger: Messenger
+    pool : concurrent.futures.ThreadPoolExecutor
+    web_socket_server: TradeBotWebsocketServer
 
     def __new__(self):
         if not hasattr(self, 'instance'):
             context_factory = ContextFactory(production)
             self.context = context_factory.create_context()
             self.context.connect()
-
-            self.pool = concurrent.futures.ThreadPoolExecutor()
+            
+            self.first_bot_created = False
             self.id_bot_map = dict()
+            self.messenger = Messenger()
+            self.pool = concurrent.futures.ThreadPoolExecutor()
+            self.web_socket_server = TradeBotWebsocketServer(self.messenger)
             self.instance = super(TradeBotManager, self).__new__(self)
         return self.instance
     
-    def start_trade_bot(self, symbol_name: str, ema_short: int, ema_long: int, messenger: str):
+    def start_trade_bot(self, symbol_name: str, ema_short: int, ema_long: int):
+
         action_writer = ActionWriter()
         
         symbol_factory = SymbolFactory(True)
@@ -38,6 +45,7 @@ class TradeBotManager():
         account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
 
         trade_execution_factory = TradeExecutionFactory(True)
+        messenger = self.messenger if self.first_bot_created else None
         trade_executor = trade_execution_factory.create_trade_executor(account, symbol, messenger)
         
         strategy = EmaStrategy(symbol, ema_short, ema_long, action_writer, console_output=True)
@@ -46,6 +54,10 @@ class TradeBotManager():
         
         try: 
             self.pool.submit(trade_bot.run)
+            if not self.first_bot_created:
+                self.web_socket_server.start()
+                self.messenger.start()
+                self.first_bot_created = True
             self.id_bot_map[trade_bot.uuid] = trade_bot
             return trade_bot.get_properties_as_dict()
         except:
@@ -67,3 +79,5 @@ class TradeBotManager():
     def stop_all_bots(self):
         for bot in self.id_bot_map.values():
             bot.cancel()
+        self.web_socket_server.start()
+        self.messenger.start()

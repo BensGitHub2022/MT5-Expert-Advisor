@@ -11,12 +11,10 @@ class WebService():
 
     account: IAccount
     trade_bot_manager: TradeBotManager
-    messenger: str
 
-    def __init__(self, name: str, account: IAccount, trade_bot_manager: TradeBotManager, messenger:str) -> None:
+    def __init__(self, name: str, account: IAccount, trade_bot_manager: TradeBotManager) -> None:
         self.trade_bot_manager = trade_bot_manager
         self.account = account
-        self.messenger = messenger
 
         self.app = Flask(name)
         CORS(self.app)
@@ -47,7 +45,6 @@ class WebService():
 
     def create_bot(self):
         try:
-            print("creating")
             http_body = request.json
             ema_short = int(http_body['ema_short'])
             ema_long = int(http_body['ema_long'])
@@ -55,7 +52,7 @@ class WebService():
             if ema_short >= ema_long or symbol not in allowed_symbol_names or ema_short > 500 or ema_long > 1000:
                 raise ValueError
             
-            trade_bot_properties_json = self.trade_bot_manager.start_trade_bot(symbol, ema_short, ema_long, self.messenger)
+            trade_bot_properties_json = self.trade_bot_manager.start_trade_bot(symbol, ema_short, ema_long)
             
             if trade_bot_properties_json == None:
                 return jsonify({ "message": "Bot creation failed." }), 500

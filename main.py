@@ -5,7 +5,6 @@ from pandas.errors import SettingWithCopyWarning # Bad
 from api.web_service import WebService
 
 from src.trade_bot_manager import TradeBotManager
-# from src.ws_server import Messenger, TradeBotWebsocketServer
 
 def main():
     # NOTE: (Supress warnings) Need to decide if these present true issues.
@@ -20,15 +19,9 @@ def main():
     # Composition root
     print("Hello Trade Bot!")
     
-    # set up web socket
-    messenger = None
-    # ws_server = TradeBotWebsocketServer(messenger)
-    # messenger.start()
-    # ws_server.start()
-    
     # set up trade bot manager (manages bot thread pool)
     trade_bot_manager = TradeBotManager()
-    web_service = WebService(__name__, None, trade_bot_manager, messenger)
+    web_service = WebService(__name__, None, trade_bot_manager)
     web_service.run()
     
     # stay alive until there's a keyboard interrupt
@@ -40,8 +33,6 @@ def main():
         print("shutting down")
         trade_bot_manager.stop_all_bots()
         web_service.stop()
-        # ws_server.stop()
-        # messenger.stop()
     
     input()
 

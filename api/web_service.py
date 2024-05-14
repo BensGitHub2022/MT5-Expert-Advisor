@@ -39,7 +39,7 @@ class WebService():
     
     def get_history(self):
         return self.account.get_deal_history()
-    
+
     def thread_proc(self):
         self.app.run("localhost", 5000)
 

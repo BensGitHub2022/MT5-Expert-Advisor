@@ -123,7 +123,7 @@ class TradeExecutorMT5():
     
     def close_all_positions(self, deviation) -> bool:
         positions = self.account_info.get_positions()
-        for position in positions["positions"]:
+        for position in positions:
             self.close_position(position, deviation)
     
     def do_nothing(self) -> None:

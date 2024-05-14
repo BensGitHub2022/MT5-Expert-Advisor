@@ -46,7 +46,7 @@ class TradeBotManager():
         account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
 
         trade_execution_factory = TradeExecutionFactory(production)
-        messenger = self.messenger if self.first_bot_created else None
+        messenger = self.messenger if not self.first_bot_created else None
         trade_executor = trade_execution_factory.create_trade_executor(account, symbol, messenger)
         
         strategy = EmaStrategy(symbol, ema_short, ema_long, action_writer, console_output=True)
@@ -80,5 +80,5 @@ class TradeBotManager():
     def stop_all_bots(self):
         for bot in self.id_bot_map.values():
             bot.cancel()
-        self.web_socket_server.start()
-        self.messenger.start()
+        self.web_socket_server.stop()
+        self.messenger.stop()

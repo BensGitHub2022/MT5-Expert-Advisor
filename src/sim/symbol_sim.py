@@ -18,14 +18,14 @@ class SymbolSimulator(ISymbol):
 
     candles_df: pd.DataFrame
 
-    symbol: str 
+    symbol_name: str 
     timeframe: str 
     start_pos: int
 
     current_time: int # NOTE: the only use for this is to obtain ticks based on current candlestick time but get_ticks method hasn't been defined yet. 
 
     def __init__(self, symbol, timeframe, candles_mock_location="mock/candlesticks.csv", ticks_mock_location="mock/ticks.csv"):
-        self.symbol = symbol # NOTE: Devise a way to set the symbol to match the mock location of a file
+        self.symbol_name = symbol # NOTE: Devise a way to set the symbol to match the mock location of a file
         self.timeframe = timeframe
         
         self.ticks_df_master = self.get_ticks_from_csv(ticks_mock_location)
@@ -78,7 +78,7 @@ class SymbolSimulator(ISymbol):
         pass
 
     def get_symbol_name(self) -> str:
-        return self.symbol
+        return self.symbol_name
     
     def get_symbol_timeframe(self) -> str:
         return self.timeframe

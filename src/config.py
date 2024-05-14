@@ -22,7 +22,3 @@ class Config():
         else:
             self.candlesticks_filepath = ""
             self.ticks_filepath = ""
-        
-
-
-        

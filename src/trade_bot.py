@@ -1,5 +1,4 @@
-import threading
-
+from uuid import uuid4
 from src.action_writer import ActionWriter
 from src.interfaces import (IMessenger,IAccount, IContext, IStrategy, ISymbol,
                             ITradeExecutor)
@@ -19,12 +18,13 @@ class TradeBot(object):
     account: IAccount
     trade_executor: ITradeExecutor
     action_writer: ActionWriter
+    uuid: uuid4
 
     # instance variables (created internally)
-    thread: threading.Thread
     cancelled: bool
 
     def __init__(self, messenger: IMessenger, context: IContext, action_writer: ActionWriter,strategy: IStrategy, symbol: ISymbol, account: IAccount, trade_executor: ITradeExecutor):
+        self.cancelled = False
         self.messenger = messenger
         self.context = context
         self.action_writer = action_writer
@@ -32,25 +32,9 @@ class TradeBot(object):
         self.symbol = symbol
         self.account = account
         self.trade_executor = trade_executor
+        self.uuid = uuid4()
 
-        self.thread = threading.Thread(target=self.thread_func)
-        self.cancelled = False
-
-    def start(self):
-        print("Trade Bot started execution!")
-        print("Press 'ctrl + C' to stop")
-        self.thread.start()
-        
-    def stop(self):
-        print("Trade Bot stopped execution!")
-        self.cancelled = True
-        self.thread.join()
-
-    def thread_func(self):
-
-        connected = self.context.connect()
-        if (not connected):
-            return
+    def run(self):
 
         print("Using the " + self.strategy.get_strategy_name() + ", trading on " + self.symbol.get_symbol_name() + ", at " + self.symbol.get_symbol_timeframe() + ", with fast EMA: " + str(self.strategy.get_ema_short()) + " and slow EMA: " + str(self.strategy.get_ema_long()))
         
@@ -81,4 +65,15 @@ class TradeBot(object):
             if(strategy_continue == -1):
                 print("Strategy finished executing!")
                 break
-        return
+
+    def cancel(self):
+        self.cancelled = True
+
+    def get_properties_as_dict(self) -> dict:
+        return {
+            "id": self.uuid,
+            "symbol": self.symbol.symbol_name,
+            "ema_short": self.strategy.ema_short,
+            "ema_long": self.strategy.ema_long
+        }
+

@@ -11,8 +11,8 @@ class ContextFactory():
     def __init__(self, production: bool):
         self.production = production
 
-    def create_context(self, credentials: dict) -> IContext:
+    def create_context(self) -> IContext:
         if (self.production):
-            return ContextMT5(credentials)
+            return ContextMT5()
         else:
-            return ContextSimulator(credentials)
+            return ContextSimulator()

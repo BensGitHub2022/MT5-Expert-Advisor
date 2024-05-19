@@ -127,7 +127,7 @@ class TradeExecutorMT5():
             self.close_position(position, deviation)
     
     def do_nothing(self) -> None:
-        print("No actionable trades!")
+        print("No actionable trades for " + self.symbol.symbol_name + "!")
         return
     
 class OrderType(Enum):

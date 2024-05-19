@@ -34,7 +34,8 @@ class TradeExecutorSimulator():
         print("result of order: ")
         print("add position: {}, update balance: {}".format(result_add_position, result_update_balance))
         print("1. order_send: {} {} {} lots at {} with deviation={} points".format(signal.signal_type.value, symbol,volume,price,deviation))
-        self.messenger.queue_message(self.account_info.action_writer.get_position_history())
+        if self.messenger:
+            self.messenger.queue_message(self.account_info.action_writer.get_position_history())
         return True
     
     def close_position(self, position, deviation) -> bool:
@@ -62,7 +63,8 @@ class TradeExecutorSimulator():
         positions = self.account_info.get_positions()
         for position in positions:
             self.close_position(position, deviation)
-        self.messenger.queue_message(self.account_info.action_writer.get_position_history())
+        if self.messenger:
+            self.messenger.queue_message(self.account_info.action_writer.get_position_history())
 
     def do_nothing(self) -> None:
         #print("No actionable trades!")

@@ -2,31 +2,11 @@
 import warnings # Bad
 from pandas.errors import SettingWithCopyWarning # Bad
 
-import sys
-
-from src.factories.account_factory import AccountFactory
-from src.action_writer import ActionWriter
-from src.factories.context_factory import ContextFactory
-from src.ema_strategy import EmaStrategy
-from src.factories.symbol_factory import SymbolFactory
-from src.trade_bot import TradeBot
 from api.web_service import WebService
 
-
-from src.factories.trade_executor_factory import TradeExecutionFactory
-from src.config import Config
-from src.ws_server import Messenger, TradeBotWebsocketServer
+from src.trade_bot_manager import TradeBotManager
 
 def main():
-    # NOTE: Args Key:
-    # 1 - symbol name OR settings
-    # 2 - Production flag, 1 == True, 0 == False
-    # 3 - EMA short
-    # 4 - EMA long
-    # Example: BTCUSD 1 500 1000
-    args = sys.argv[1:]
-    config = Config(args)
-    
     # NOTE: (Supress warnings) Need to decide if these present true issues.
     warnings.simplefilter(action='ignore', category=FutureWarning) # Bad <- this one relates to passing NaN to pd.concat, will be depricated in future
     warnings.simplefilter(action='ignore', category=SettingWithCopyWarning) # Bad <- this one relates to copy of a slice of a dataframe
@@ -38,44 +18,23 @@ def main():
 
     # Composition root
     print("Hello Trade Bot!")
-
-    action_writer = ActionWriter()
-    messenger = Messenger()
-    ws_server = TradeBotWebsocketServer(messenger)
-
-    context_factory = ContextFactory(production=config.production)
-    context = context_factory.create_context(config.credentials)
     
-    symbol_factory = SymbolFactory(production=config.production)
-    symbol = symbol_factory.create_symbol(config.symbol, config.timeframe, candles_mock_location=config.candlesticks_filepath, ticks_mock_location=config.ticks_filepath)
-
-    account_factory = AccountFactory(production=config.production)
-    account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
-
-    # FLASK. This runs on a seperate (daemon) thread
-    ws = WebService(__name__, account)
-    ws.run()
-
-    trade_execution_factory = TradeExecutionFactory(production=config.production)
-    trade_executor = trade_execution_factory.create_trade_executor(account, symbol, messenger)
+    # set up trade bot manager (manages bot thread pool)
+    trade_bot_manager = TradeBotManager()
+    web_service = WebService(__name__, None, trade_bot_manager)
+    web_service.run()
     
-    strategy = EmaStrategy(symbol,config.ema_short,config.ema_long, action_writer, console_output=config.production)
-
-    trade_bot = TradeBot(messenger, context, action_writer, strategy, symbol, account, trade_executor)
-    
-    trade_bot.start()
-    messenger.start()
-    ws_server.start()
-
+    # stay alive until there's a keyboard interrupt
     try:
-        while(not trade_bot.cancelled):
+        while(True):
             kill_bot = input()
             print(kill_bot + " is not a recognized command!")
     except KeyboardInterrupt:
-        trade_bot.cancelled = True
-        trade_bot.stop()
-        ws_server.stop()
-        messenger.stop()
+        print("shutting down")
+        trade_bot_manager.stop_all_bots()
+        web_service.stop()
+    
+    input()
 
 if __name__ == '__main__':
     main()

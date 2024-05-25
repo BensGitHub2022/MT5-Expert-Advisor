@@ -63,10 +63,10 @@ class WebService():
 
     def delete_bot(self):
         http_body = request.json
-        bot_id = UUID(http_body["id"])
-        bot_deleted = self.trade_bot_manager.delete_trade_bot(bot_id)
+        symbol_name = http_body["symbol_name"]
+        bot_deleted = self.trade_bot_manager.delete_trade_bot(symbol_name)
         if bot_deleted:
-            return jsonify({ "message": f"Bot with id {bot_id} deleted." }), 200
+            return jsonify({ "message": f"Bot for {symbol_name} deleted." }), 200
         else:
             return jsonify({ "message": "Bot deletion failed." }), 500
 

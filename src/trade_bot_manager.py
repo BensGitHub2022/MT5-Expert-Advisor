@@ -16,7 +16,7 @@ class TradeBotManager():
 
     context: IContext
     first_bot_created: bool
-    id_bot_map: dict
+    symbol_name_bot_map: dict
     messenger: Messenger
     pool : concurrent.futures.ThreadPoolExecutor
     web_socket_server: TradeBotWebsocketServer
@@ -28,7 +28,7 @@ class TradeBotManager():
             self.context.connect()
             
             self.first_bot_created = False
-            self.id_bot_map = dict()
+            self.symbol_name_bot_map = dict()
             self.messenger = Messenger()
             self.pool = concurrent.futures.ThreadPoolExecutor()
             self.web_socket_server = TradeBotWebsocketServer(self.messenger)
@@ -36,6 +36,8 @@ class TradeBotManager():
         return self.instance
     
     def start_trade_bot(self, symbol_name: str, ema_short: int, ema_long: int):
+        if symbol_name in self.symbol_name_bot_map.keys():
+            return None
         config = Config(symbol_name)
         action_writer = ActionWriter()
         
@@ -59,26 +61,26 @@ class TradeBotManager():
                 self.web_socket_server.start()
                 self.messenger.start()
                 self.first_bot_created = True
-            self.id_bot_map[trade_bot.uuid] = trade_bot
+            self.symbol_name_bot_map[symbol_name] = trade_bot
             return trade_bot.get_properties_as_dict()
         except:
             return None
     
-    def delete_trade_bot(self, bot_id: int):
-        if bot_id in self.id_bot_map:
-            self.id_bot_map[bot_id].cancel()
-            del self.id_bot_map[bot_id]
+    def delete_trade_bot(self, symbol_name: str):
+        if symbol_name in self.symbol_name_bot_map:
+            self.symbol_name_bot_map[symbol_name].cancel()
+            del self.symbol_name_bot_map[symbol_name]
             return True
         return False
 
     def get_details_for_all_bots(self):
         bot_details = []
-        for bot in self.id_bot_map.values():
+        for bot in self.symbol_name_bot_map.values():
             bot_details.append(bot.get_properties_as_dict())
         return bot_details
     
     def stop_all_bots(self):
-        for bot in self.id_bot_map.values():
+        for bot in self.symbol_name_bot_map.values():
             bot.cancel()
         self.web_socket_server.stop()
         self.messenger.stop()

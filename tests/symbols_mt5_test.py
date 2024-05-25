@@ -58,6 +58,6 @@ class SymbolMT5Tests(unittest.TestCase):
         assert self.symbol.get_symbol_info_ask() == self.ask_price
         
     @patch('src.metatrader.symbol_mt5.mt5.symbol_info_tick')
-    def test_get_symbol_info_ask(self, symbol_info_tick_query):
+    def test_get_symbol_info_bid(self, symbol_info_tick_query):
         symbol_info_tick_query.return_value = self.symbol_info_tick_response
         assert self.symbol.get_symbol_info_bid() == self.bid_price

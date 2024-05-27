@@ -13,6 +13,7 @@ classDiagram
         +EmaStrategy
         +ActionWriter
         +WebService
+
         +Messenger
         +WebsocketServer
         +main()
@@ -121,6 +122,14 @@ classDiagram
         +websockets.sync.server websocket_server
         +start()
         +stop()
+    }
+
+    class WebService{
+        +IAccount account
+        +Flask app
+        +get_account()
+        +get_positions()
+        +thread_proc()
     }
 
     class IContext {
@@ -298,7 +307,8 @@ classDiagram
     Main *-- TradeBot
     Main *-- Config
     Main *-- ActionWriter
-    Main *-- Webservice
+    Main *-- WebService
+
     Main *-- Messenger
     Main *-- WebsocketServer
     Main *-- ContextFactory
@@ -320,7 +330,7 @@ classDiagram
     EmaStrategy <.. ISymbol : dependency
     TradeExecutorFactory <.. ISymbol : dependency
     TradeExecutorFactory <.. IAccount : dependency
-    WebsocketServer <.. IMessenger : dependency
+    WebsocketServer <.. IMessenger : dependency 
     
     EmaStrategy -- Config : parameter
     ContextFactory -- Config : parameter
@@ -344,5 +354,4 @@ classDiagram
     ITradeExecutor <|-- TradeExecutorSimulator : implements
     IAccount <|-- AccountMT5 : implements
     IAccount <|-- AccountSimulator : implements
-
 ```

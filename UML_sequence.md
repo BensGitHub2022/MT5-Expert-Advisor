@@ -7,7 +7,7 @@ participant main.py
 participant Trade Bot
 participant Messenger
 participant index.html
-participant Platform
+participant Platform (MT5)
 
 main.py -->> main.py: python .\main.py <symbol> <production flag> <ema short> <ema long>
 Note right of main.py: "Hello Trade Bot!"
@@ -17,8 +17,8 @@ main.py->>Trade Bot: trade_bot.start()
 activate Trade Bot
 Note left of Trade Bot: "Trading bot initialized!"
 Trade Bot -->> Trade Bot: connect()
-Trade Bot ->> Platform: attempts connection
-Platform ->> Trade Bot: login successful
+Trade Bot ->> Platform (MT5): attempts connection
+Platform (MT5) ->> Trade Bot: login successful
 Note left of Trade Bot: "Trading bot log in successfull!"
 Trade Bot -->> Trade Bot: execute_strategy()
 main.py->>Messenger: messenger.start()
@@ -29,25 +29,27 @@ Messenger ->> index.html: http 1.1 handshake protocol
 index.html ->> Messenger: http 1.1 handshake protocol
 Note left of Trade Bot: "New signal!"
 Trade Bot -->> Trade Bot: place_order()
-Trade Bot ->> Platform: order_send(request)
-Platform ->> Trade Bot: ret_code 10009 (order success)
+Trade Bot ->> Platform (MT5): order_send(request)
+Platform (MT5) ->> Trade Bot: ret_code 10009 (order success)
 Trade Bot -->> Trade Bot: new_position()
 Trade Bot ->> Messenger: queue_message()
 Messenger ->> index.html: send_message()
 Note right of index.html: "Balance on Month/Day/Year Minute:Seconds"
+index.html -->> index.html: on_message() => chart.update() 
 index.html ->> Messenger: echo_message()
 Note right of index.html: "Server received... Balance on Month/Day/Year Minute:Seconds"
 Note left of Trade Bot: "New signal!"
 Trade Bot -->> Trade Bot: close_position()
-Trade Bot ->> Platform: order_send(request)
-Platform ->> Trade Bot: ret_code 10009 (order success)
+Trade Bot ->> Platform (MT5): order_send(request)
+Platform (MT5) ->> Trade Bot: ret_code 10009 (order success)
 Trade Bot -->> Trade Bot: place_order()
-Trade Bot ->> Platform: order_send(request)
-Platform ->> Trade Bot: ret_code 10009 (order success)
+Trade Bot ->> Platform (MT5): order_send(request)
+Platform (MT5) ->> Trade Bot: ret_code 10009 (order success)
 Trade Bot -->> Trade Bot: new_position()
 Trade Bot ->> Messenger: queue_message()
 Messenger ->> index.html: send_message()
 Note right of index.html: "Balance on Month/Day/Year Minute:Seconds"
+index.html -->> index.html: on_message() => chart.update() 
 index.html ->> Messenger: echo_message()
 Note right of index.html: "Server received... Balance on Month/Day/Year Minute:Seconds"
 Note right of main.py: User presses 'Ctrl + C'

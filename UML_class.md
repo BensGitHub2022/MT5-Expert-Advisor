@@ -4,22 +4,19 @@ title: Trade Bot - UML Class Diagram
 ---
 classDiagram
     class Main {
-        +sys args
         +Config config
         +TradeBot trade_bot
         +ContextFactory
         +SymbolFactory
         +AccountFactory
         +TradeExecutorFactory
+        +EmaStrategy
+        +ActionWriter
+        +WebService
+        +Messenger
+        +WebsocketServer
         +main()
     }
-
-    Main *-- TradeBot
-    Main *-- Config
-    Main *-- ContextFactory
-    Main *-- SymbolFactory 
-    Main *-- AccountFactory
-    Main *-- TradeExecutorFactory
 
     class TradeBot {
         +IMessenger messenger
@@ -36,19 +33,6 @@ classDiagram
         +thread_func()
     }
 
-    TradeBot <.. IContext : dependency
-    TradeBot <.. IStrategy : dependency
-    TradeBot <.. ISymbol : dependency
-    TradeBot <.. IAccount : dependency
-    TradeBot <.. ITradeExecutor : dependency
-    TradeBot <.. IActionWriter : dependency
-    TradeBot <.. IMessenger : dependency
-
-    ContextFactory --> IContext
-    SymbolFactory --> ISymbol
-    AccountFactory --> IAccount
-    TradeExecutorFactory --> ITradeExecutor
-
     class Config {
         +str filepath
         +int production
@@ -62,10 +46,6 @@ classDiagram
         +JsonReader json_reader
     }
 
-    Config *-- JsonReader
-    Config <-- SymbolFactory
-    Config <-- ContextFactory
-
     class JsonReader {
         +str file_path
         +dict json_data
@@ -74,22 +54,22 @@ classDiagram
 
     namespace Factories{
         class ContextFactory {
-        +bool production
+        +bool config.production
         create_context(config.credentials)
         }
 
         class SymbolFactory {
-            +bool production
+            +bool config.production
             create_symbol(config.symbol, config.timeframe)
         }
 
         class AccountFactory {
-            +bool production
+            +bool config.production
             create_account(action_writer)
         }
 
         class TradeExecutorFactory {
-            +bool production
+            +bool config.production
             create_context(account, symbol)
         }
     }
@@ -100,8 +80,6 @@ classDiagram
         +write_position()
         +record_position()
     }
-
-    IActionWriter <|-- ActionWriter : implements
 
     class ActionWriter {
         +bool initialized_act
@@ -119,18 +97,28 @@ classDiagram
         +get_message()
     }
 
-    IMessenger <|-- Messenger : implements
-
     class Messenger{
         <<service>>
         +threading.Semaphore sem
         +threading.Lock lock
         +list queue
+        +list connection_list
+        +threading.Lock connection_lock
         +threading.Thread thread
         +bool cancelled
-        +logging logger
-        +trade_bot_service()
-        +server_thread_proc()
+        +queue_message()
+        +get_message()
+        +server_connection()
+        +thread_proc()
+        +remove_connection()
+        +start()
+        +stop()
+    }
+
+    class WebsocketServer{
+        +threading.Thread thread
+        +Messenger messenger
+        +websockets.sync.server websocket_server
         +start()
         +stop()
     }
@@ -139,9 +127,6 @@ classDiagram
         <<interface>>
         +connect()
     }
-
-      IContext <|-- ContextMT5 : implements
-      IContext <|-- ContextSimulator : implements
 
     class ContextSimulator {
         +dict credentials
@@ -157,9 +142,6 @@ classDiagram
         +process_next()
         +check_next()
     }
-
-      IStrategy <|-- EmaStrategy : implements
-      EmaStrategy <.. ISymbol : dependency
     
     class EmaStrategy {
         +Isymbol symbol
@@ -198,9 +180,6 @@ classDiagram
         +get_candlestick_time()
         +get_symbol_info_tick()
     }
-
-    ISymbol <|-- SymbolMT5 : implements
-    ISymbol <|-- SymbolSimulator : implements
 
     class SymbolMT5 {
         +np.array candles 
@@ -243,8 +222,6 @@ classDiagram
         +get_ticks_from_csv(candles_mock_location)
     }
 
-    SymbolSimulator *-- Counter
-
     class Counter {
         +int current_index
         +int dataframe_size
@@ -266,9 +243,6 @@ classDiagram
         +calc_lot_size()
     }
 
-    ITradeExecutor <|-- TradeExecutorMT5 : implements
-    ITradeExecutor <|-- TradeExecutorSimulator : implements
-
     class TradeExecutorMT5{
         float current_risk_per_trade 
         +float current_lot_size
@@ -278,10 +252,6 @@ classDiagram
         +close_all_positions()
         +do_nothing()
     }
-
-    TradeExecutorMT5 <.. ISymbol : dependency
-    TradeExecutorMT5 <.. IAccount : dependency
-
 
     class TradeExecutorSimulator{
         +float current_risk_per_trade 
@@ -293,18 +263,12 @@ classDiagram
         +do_nothing()
     }
 
-    TradeExecutorSimulator <.. ISymbol : dependency
-    TradeExecutorSimulator <.. IAccount : dependency
-
     class IAccount {
         <<interface>>
         IAccount: +get_positions()
         IAccount: +get_account_balance()
         IAccount: +get_account_profit()
     }
-
-    IAccount <|-- AccountMT5 : implements
-    IAccount <|-- AccountSimulator : implements
 
     class AccountMT5 {
         +get_account_info()
@@ -330,5 +294,55 @@ classDiagram
         +convert_epoch_time()
         +record_position()
     }
+
+    Main *-- TradeBot
+    Main *-- Config
+    Main *-- ActionWriter
+    Main *-- Webservice
+    Main *-- Messenger
+    Main *-- WebsocketServer
+    Main *-- ContextFactory
+    Main *-- SymbolFactory
+    Main *-- AccountFactory
+    Main *-- TradeExecutorFactory
+
+    Config *-- JsonReader
+    SymbolSimulator *-- Counter
+
+    TradeBot <.. IContext : dependency
+    TradeBot <.. IStrategy : dependency
+    TradeBot <.. ISymbol : dependency
+    TradeBot <.. IAccount : dependency
+    TradeBot <.. ITradeExecutor : dependency
+    TradeBot <.. IActionWriter : dependency
+    TradeBot <.. IMessenger : dependency
+
+    EmaStrategy <.. ISymbol : dependency
+    TradeExecutorFactory <.. ISymbol : dependency
+    TradeExecutorFactory <.. IAccount : dependency
+    WebsocketServer <.. IMessenger : dependency
+    
+    EmaStrategy -- Config : parameter
+    ContextFactory -- Config : parameter
+    SymbolFactory -- Config : parameter
+    AccountFactory -- Config : parameter
+    TradeExecutorFactory -- Config : parameter
+
+    ContextFactory --> IContext
+    SymbolFactory --> ISymbol
+    AccountFactory --> IAccount
+    TradeExecutorFactory --> ITradeExecutor
+
+    IActionWriter <|-- ActionWriter : implements
+    IMessenger <|-- Messenger : implements
+    IContext <|-- ContextMT5 : implements
+    IContext <|-- ContextSimulator : implements
+    IStrategy <|-- EmaStrategy : implements
+    ISymbol <|-- SymbolMT5 : implements
+    ISymbol <|-- SymbolSimulator : implements
+    ITradeExecutor <|-- TradeExecutorMT5 : implements
+    ITradeExecutor <|-- TradeExecutorSimulator : implements
+    IAccount <|-- AccountMT5 : implements
+    IAccount <|-- AccountSimulator : implements
 
 ```

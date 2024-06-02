@@ -25,6 +25,8 @@ class AccountMT5(IAccount):
     def get_positions(self) -> dict: # Note on 1.21.24 that MT5 returns positions as a named Tuple
         try:
             positions = mt5.positions_get()
+            if positions is None:
+                raise RuntimeError
             return positions
         except BaseException:
             raise RuntimeError('No positions returned from MT5. Error is ' + str(mt5.last_error() or ''))

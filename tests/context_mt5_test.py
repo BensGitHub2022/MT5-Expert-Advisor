@@ -24,31 +24,38 @@ class ContextMT5Tests(unittest.TestCase):
     
     @classmethod
     def setUpClass(self):
-        self.context_with_complete_creds = ContextMT5(self.credentials)
+        self.context = ContextMT5()
 
     @patch('src.metatrader.context_mt5.mt5.login')
     @patch('src.metatrader.context_mt5.mt5.initialize')
-    def test_connect_init_and_login_successful(self, mock_init, mock_login):
+    @patch('src.json_reader.JsonReader.get_json_data')
+    def test_connect_init_and_login_successful(self, mock_get_json_data, mock_init, mock_login):
+        mock_get_json_data.return_value = self.credentials
         mock_init.return_value = True
         mock_login.return_value = True
-        assert self.context_with_complete_creds.connect()
+        assert self.context.connect()
 
     @patch('src.metatrader.context_mt5.mt5.initialize')
-    def test_connect_initialization_errors(self, mock_init):
+    @patch('src.json_reader.JsonReader.get_json_data')
+    def test_connect_initialization_errors(self, mock_get_json_data, mock_init):
+        mock_get_json_data.return_value = self.credentials
         mock_init.return_value = False
         with pytest.raises(ConnectionError):
-            self.context_with_complete_creds.connect()
+            self.context.connect()
   
     @patch('src.metatrader.context_mt5.mt5.login')
     @patch('src.metatrader.context_mt5.mt5.initialize')
-    def test_connect_login_errors(self, mock_init, mock_login):
+    @patch('src.json_reader.JsonReader.get_json_data')
+    def test_connect_login_errors(self, mock_get_json_data, mock_init, mock_login):
+        mock_get_json_data.return_value = self.credentials
         mock_init.return_value = True
         mock_login.return_value = False
         with pytest.raises(PermissionError):
-            self.context_with_complete_creds.connect()
+            self.context.connect()
     
-    def test_connect_credential_value_missing(self):
-        context_with_no_credentials = ContextMT5({})
+    @patch('src.json_reader.JsonReader.get_json_data')
+    def test_connect_credential_value_missing(self, mock_get_json_data):
+        mock_get_json_data.return_value = {}
         with pytest.raises(KeyError):
-            context_with_no_credentials.connect()
+            self.context.connect()
     

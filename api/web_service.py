@@ -3,6 +3,7 @@ import threading
 from uuid import UUID, uuid4
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from src.action_writer import ActionWriter
 from src.constants import allowed_symbol_names
 from src.interfaces import IAccount
 from src.trade_bot_manager import TradeBotManager
@@ -10,11 +11,13 @@ from src.trade_bot_manager import TradeBotManager
 class WebService():
 
     account: IAccount
+    action_writer: ActionWriter
     trade_bot_manager: TradeBotManager
 
-    def __init__(self, name: str, account: IAccount, trade_bot_manager: TradeBotManager) -> None:
-        self.trade_bot_manager = trade_bot_manager
+    def __init__(self, name: str, trade_bot_manager: TradeBotManager, account: IAccount, action_writer: ActionWriter) -> None:
         self.account = account
+        self.action_writer = action_writer
+        self.trade_bot_manager = trade_bot_manager
 
         self.app = Flask(name)
         CORS(self.app)
@@ -52,7 +55,7 @@ class WebService():
             if ema_short >= ema_long or symbol not in allowed_symbol_names or ema_short > 500 or ema_long > 1000:
                 raise ValueError
             
-            trade_bot_properties_json = self.trade_bot_manager.start_trade_bot(symbol, ema_short, ema_long)
+            trade_bot_properties_json = self.trade_bot_manager.start_trade_bot(symbol, ema_short, ema_long, self.account, self.action_writer)
             
             if trade_bot_properties_json == None:
                 return jsonify({ "message": "Bot creation failed." }), 500

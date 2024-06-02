@@ -4,6 +4,9 @@ from pandas.errors import SettingWithCopyWarning # Bad
 
 from api.web_service import WebService
 
+from src.action_writer import ActionWriter
+from src.constants import production
+from src.factories.account_factory import AccountFactory
 from src.trade_bot_manager import TradeBotManager
 
 def main():
@@ -19,9 +22,14 @@ def main():
     # Composition root
     print("Hello Trade Bot!")
     
+    action_writer = ActionWriter()
+    
+    account_factory = AccountFactory(production)
+    account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
+    
     # set up trade bot manager (manages bot thread pool)
     trade_bot_manager = TradeBotManager()
-    web_service = WebService(__name__, None, trade_bot_manager)
+    web_service = WebService(__name__, trade_bot_manager, account, action_writer)
     web_service.run()
     
     # stay alive until there's a keyboard interrupt

@@ -1,7 +1,7 @@
 import concurrent.futures
 from src.config import Config
 from src.factories.context_factory import ContextFactory
-from src.interfaces import IContext
+from src.interfaces import IAccount, IContext
 from src.factories.account_factory import AccountFactory
 from src.action_writer import ActionWriter
 from src.ema_strategy import EmaStrategy
@@ -35,15 +35,11 @@ class TradeBotManager():
             self.instance = super(TradeBotManager, self).__new__(self)
         return self.instance
     
-    def start_trade_bot(self, symbol_name: str, ema_short: int, ema_long: int):
+    def start_trade_bot(self, symbol_name: str, ema_short: int, ema_long: int, account: IAccount, action_writer: ActionWriter):
         config = Config(symbol_name)
-        action_writer = ActionWriter()
         
         symbol_factory = SymbolFactory(production)
         symbol = symbol_factory.create_symbol(symbol_name, config.timeframe, candles_mock_location=config.candlesticks_filepath, ticks_mock_location=config.ticks_filepath)
-
-        account_factory = AccountFactory(production)
-        account = account_factory.create_account(balance = 100000, profit = 0, action_writer=action_writer)
 
         trade_execution_factory = TradeExecutionFactory(production)
         messenger = self.messenger if not self.first_bot_created else None

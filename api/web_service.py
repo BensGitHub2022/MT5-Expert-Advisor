@@ -38,7 +38,9 @@ class WebService():
         return self.account.get_account_info()
 
     def get_positions(self):
-        return self.account.get_positions()
+        positions = self.account.get_positions()
+        list = [position._asdict() for position in positions]
+        return { "orders": list }
     
     def get_history(self):
         return self.account.get_deal_history()
